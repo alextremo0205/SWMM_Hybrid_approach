@@ -106,109 +106,6 @@ def new_rain_lines(rainfall_dict, name_new_rain = 'name_new_rain'):
 
 
 
-
-
-
-def inp_to_G(lines):
-    #Reading the headers of the inp file
-    inp_dict = dict()
-
-    inp_dict = {line:number for (number,line) in enumerate(lines) if line[0] == "["}
-
-    #Create NetworkX graph
-    G = nx.Graph()
-
-    #Extracting the node coordinates from the inp file and saving them in the nx graph
-    # Nodes ---------------------------------------------------------------------------------------------
-    points = []
-    node_names = []
-    # with open(working_inp) as f:
-    #     lines = f.readlines()
-    for i in range(inp_dict['[COORDINATES]\n']+3, inp_dict['[VERTICES]\n']-1): #TO-DO: this can be turned into a while loop
-        point = lines[i].split()
-        name_of_node = point[0]
-        node_names.append(name_of_node)
-        G.add_node(name_of_node, pos=(float(point[1]),float(point[2])) )
-        points.append(lines[i])
-
-
-    #Edges-----------------------------------------------------------------------------------------------
-    conduits = []
-    try:
-        end = inp_dict['[PUMPS]\n']-1
-    except Exception as e:
-        print("The file does not have pumps. A handled exception occured because of "+str(e))
-        end =  inp_dict['[VERTICES]\n']-1
-
-
-    # with open(working_inp) as f:
-    # lines = f.readlines()
-    i = inp_dict['[CONDUITS]\n']+3
-    link = lines[i].split()[:-6]
-    
-    while link != []:
-        G.add_edge(link[1],link[2])
-        conduits.append(link)
-        i +=1
-        link = lines[i].split()[:-6]
-
-    #Pumps----------------------------------------------------------------------------
-    pumps = []
-
-    try:
-        end = inp_dict['[PUMPS]\n']-1
-    
-        # with open(working_inp) as f:
-        #     lines = f.readlines()
-        for i in range(inp_dict['[PUMPS]\n']+3, inp_dict['[ORIFICES]\n']-1):
-            # print(lines[i].split())
-            pump = lines[i].split()[:-4]
-            G.add_edge(pump[1],pump[2])
-            pumps.append(lines[i])
-    
-    except Exception as e:
-        print("The file does not have pumps. A handled exception occured because of "+str(e))
-
-    #Orifices----------------------------------------------------------------------------
-    orifices = []
-
-    try:
-        end = inp_dict['[ORIFICES]\n']-1
-        
-        # with open(working_inp) as f:
-        #     lines = f.readlines()
-        for i in range(inp_dict['[ORIFICES]\n']+3+1, inp_dict['[WEIRS]\n']-1):
-            # print(lines[i].split())
-            orifice = lines[i].split()[:-4]
-            G.add_edge(orifice[1],orifice[2])
-            orifices.append(lines[i])
-    
-    except Exception as e:
-        print("The file does not have orifices. A handled exception occured because of "+str(e))
-
-
-    #Weirs----------------------------------------------------------------------------
-    weirs = []
-
-    try:
-        end = inp_dict['[WEIRS]\n']-1
-        
-        # with open(working_inp) as f:
-        # lines = f.readlines()
-        for i in range(inp_dict['[WEIRS]\n']+3+1, inp_dict['[XSECTIONS]\n']-1):
-            # print(lines[i].split())
-            weir = lines[i].split()[:-4]
-            G.add_edge(weir[1],weir[2])
-            weirs.append(lines[i])
-        
-    except Exception as e:
-        print("The file does not have weirs. A handled exception occured because of "+str(e))
-    
-    
-    return(G, node_names)
-
-
-
 #Formatter for rain text lines --------------------------------------------------------------------------------
 #Taken from Colab: SWMM - INP Reader and INP Modifier.ipynb
 def new_rain_lines(rainfall_dict, name_new_rain = 'name_new_rain', day='1/1/2019'):
@@ -237,7 +134,7 @@ def new_rain_lines_dat(rainfall_dict, name_new_rain = 'name_new_rain', day='1', 
 
   return new_lines_rainfall
 
-def new_rain_lines_real(rainfall_dict, name_new_rain = 'name_new_rain'):#, day='1', month = '1', year = '2019'):
+def get_new_rain_lines_real(rainfall_dict, name_new_rain = 'name_new_rain'):#, day='1', month = '1', year = '2019'):
   
   new_lines_rainfall = []
 
@@ -252,6 +149,15 @@ def new_rain_lines_real(rainfall_dict, name_new_rain = 'name_new_rain'):#, day='
     # new_lines_rainfall.append(tabulator([name_new_rain, day, key, str(value)])) #before
 
   return new_lines_rainfall
+
+
+
+def get_lines_from_textfile(path):
+  with open(path, 'r') as fh:
+    lines_from_file = fh.readlines()
+  return lines_from_file
+
+
 
 
 # def datetime_range(start, end, delta):
@@ -286,10 +192,10 @@ def hietograph(rain):
 
   rain_values = [float(i) for i in rain.values()]
 
-  df = pd.DataFrame(dict(
-      date=rain_times,
-      value=rain_values
-  ))
+  # df = pd.DataFrame(dict(
+  #     date=rain_times,
+  #     value=rain_values
+  # ))
   bar = go.Bar(x=rain_times, y = rain_values) #px.bar(df, x='date', y="value")
   return bar
 

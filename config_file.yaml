@@ -1,0 +1,8 @@
+# Hydralic head configuration file
+{
+
+# networks names
+simulations_path : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations',
+inp_path: 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\Tuindorp_Right_Part.inp',
+
+}

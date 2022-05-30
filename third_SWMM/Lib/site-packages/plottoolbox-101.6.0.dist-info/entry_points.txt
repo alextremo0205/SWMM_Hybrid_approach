@@ -1,0 +1,2 @@
+[console_scripts]
+plottoolbox = plottoolbox.plottoolbox:main

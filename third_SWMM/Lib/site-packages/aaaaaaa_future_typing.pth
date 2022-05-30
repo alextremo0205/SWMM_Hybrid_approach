@@ -1,0 +1,2 @@
+import sys; exec('try:\n    import future_typing\nexcept ImportError:\n    pass\nelse:\n    future_typing.register()\n')
+

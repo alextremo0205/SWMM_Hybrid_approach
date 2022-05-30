@@ -1,0 +1,12 @@
+# Dataset configuration
+{
+# networks names
+dataset_names : [],
+
+# number of samples
+n_samples : [10000],
+
+# Rain parameters
+
+
+}

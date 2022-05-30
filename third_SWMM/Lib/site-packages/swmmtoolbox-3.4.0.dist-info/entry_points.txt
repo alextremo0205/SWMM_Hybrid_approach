@@ -1,0 +1,2 @@
+[console_scripts]
+swmmtoolbox = swmmtoolbox.swmmtoolbox:main

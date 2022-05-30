@@ -1,0 +1,3 @@
+[console_scripts]
+future_typing = future_typing.cli:cli
+

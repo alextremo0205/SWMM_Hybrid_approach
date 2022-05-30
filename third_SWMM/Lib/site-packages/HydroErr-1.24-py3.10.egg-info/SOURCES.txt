@@ -1,0 +1,10 @@
+README.md
+setup.cfg
+setup.py
+HydroErr/HydroErr.py
+HydroErr/__init__.py
+HydroErr.egg-info/PKG-INFO
+HydroErr.egg-info/SOURCES.txt
+HydroErr.egg-info/dependency_links.txt
+HydroErr.egg-info/requires.txt
+HydroErr.egg-info/top_level.txt

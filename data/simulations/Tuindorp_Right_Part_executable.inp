@@ -49,9 +49,9 @@ DRY_ONLY         NO
 ;;Name           Format    Interval SCF      Source    
 ;;-------------- --------- ------ ------ ----------
 ; Name Format Interval SCF Source
-R_1              INTENSITY 0:05     1.0      FILE       "PLACEHOLDER1"   R1         MM   
-R_2              INTENSITY 0:05     1.0      FILE       "PLACEHOLDER1"   R1         MM   
-R_3              INTENSITY 0:05     1.0      FILE       "PLACEHOLDER1"   R1         MM   
+R_1              INTENSITY 0:05     1.0      FILE       "C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\block\block.dat" R1         MM   
+R_2              INTENSITY 0:05     1.0      FILE       "C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\block\block.dat" R1         MM   
+R_3              INTENSITY 0:05     1.0      FILE       "C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\block\block.dat" R1         MM   
 
 [SUBCATCHMENTS]
 ;;Name           Rain Gage        Outlet           Area     %Imperv  Width    %Slope   CurbLen  SnowPack        

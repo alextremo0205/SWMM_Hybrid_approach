@@ -82,7 +82,7 @@ def normalize_sample_values(list_of_samples, max = None, min = None):
 def inp_to_G(lines):
     #Reading the headers of the inp file
     inp_dict = get_headers_from_inp(lines)
-
+    
     #Create NetworkX graph
     G = nx.Graph()
 
@@ -97,26 +97,20 @@ def inp_to_G(lines):
     nx.set_node_attributes(G, nodes_coordinates, "pos")
     nx.set_node_attributes(G, nodes_elevation, "elevation")
 
+    subcathments_attributes = get_subcatchments(lines, inp_dict)
+    nx.set_node_attributes(G, subcathments_attributes)
 
     #Edges-----------------------------------------------------------------------------------------------
-    conduits = []
-    try:
-        end = inp_dict['[PUMPS]\n']-1
-    except Exception as e:
-        print("The file does not have pumps. A handled exception occured because of "+str(e))
-        end =  inp_dict['[VERTICES]\n']-1
+    ##Conduits
+    conduits = get_conduits_from_inp_lines(lines, inp_dict)
+    G.add_edges_from(conduits)
+    nx.set_edge_attributes(G, conduits)
 
-
-    # with open(working_inp) as f:
-    # lines = f.readlines()
-    i = inp_dict['[CONDUITS]\n']+3
-    link = lines[i].split()[:-6]
+    x_sections = get_x_sections(lines, inp_dict)
+    phonebook = get_conduits_phonebook(G)
+    new_x_sections = change_name_xsections_to_edge_tuple(phonebook, x_sections)
+    nx.set_edge_attributes(G, new_x_sections)
     
-    while link != []:
-        G.add_edge(link[1],link[2])
-        conduits.append(link)
-        i +=1
-        link = lines[i].split()[:-6]
 
     #Pumps----------------------------------------------------------------------------
     pumps = []
@@ -180,7 +174,6 @@ def get_headers_from_inp(lines):
     return inp_dict
 
 
-
 def get_nodes_coordinates(lines, inp_dict):
     
     index = inp_dict['[COORDINATES]\n']+3
@@ -221,125 +214,98 @@ def get_elevation_from_type(type_of_node, lines, inp_dict):
     return nodes_elevation
 
 
-# Plotting
 
+
+def get_conduits_from_inp_lines(lines, inp_dict):
+    conduits = {}
+    
+    index = inp_dict['[CONDUITS]\n']+3
+    line = lines[index]
+    while line != '\n':
+        if ';' not in line:
+            edge_attributes ={}
+            
+            l_split = line.split()
+            source_node, destiny_node = l_split[1], l_split[2]
+
+            edge_attributes['name'] = l_split[0]
+            edge_attributes['length'] = l_split[3]
+            edge_attributes['roughness'] = l_split[4]
+            edge_attributes['in_offset'] = l_split[5]
+            edge_attributes['out_offset'] = l_split[6]
+
+            
+            conduits[(source_node, destiny_node)] = edge_attributes
+
+        index+=1
+        line = lines[index]
+    
+    return conduits
+
+
+def get_x_sections(lines, inp_dict):
+    x_sections={}
+    index = inp_dict['[XSECTIONS]\n']+3
+    line = lines[index]
+    
+    while line != '\n':
+        if ';' not in line:
+            x_sections_attributes ={}
+            l_split = line.split()
+
+            x_sections_attributes['shape'] = l_split[1]
+            x_sections_attributes['geom_1'] = l_split[2]
+            x_sections_attributes['geom_2'] = l_split[3]
+            #It can continue, but I don't use the rest of the values
+
+            x_sections[l_split[0]]=x_sections_attributes
+        index+=1
+        line = lines[index]
+    return x_sections
+
+def get_conduits_phonebook(G):
+    name_dict = nx.get_edge_attributes(G, 'name')
+    name_tuple = {name_dict[k] : k for k in name_dict}
+    return name_tuple
+
+def change_name_xsections_to_edge_tuple(phonebook, x_sections):
+    new_x_sections = {phonebook[k]:value for k, value in x_sections.items()}   
+    return new_x_sections
+
+
+def get_subcatchments(lines, inp_dict):
+    subcathments={}
+    index = inp_dict['[SUBCATCHMENTS]\n']+3
+    line = lines[index]
+    
+    while line != '\n':
+        if ';' not in line:
+            subcatchment_attributes ={}
+            l_split = line.split()
+            
+            subcatchment_attributes['name_subcatchment'] = l_split[0]
+            subcatchment_attributes['raingage'] = l_split[1]
+            #The name of the outlet goes as key in the dictionary.
+            subcatchment_attributes['area_subcatchment'] = l_split[3]
+            #It can continue, but I don't use the rest of the values
+
+            subcathments[l_split[2]]=subcatchment_attributes
+        index+=1
+        line = lines[index]
+    return subcathments
+
+# def get_subcatchments_phonebook(G):
+#     name_dict = nx.get_node_attributes(G, 'name')
+#     name_tuple = {name_dict[k] : k for k in name_dict}
+#     return name_tuple
+
+
+# Plotting ---------------------------------------------------
 
 def get_scatter_trace(x, y):
     trace = go.Scatter(x=x, y=y, mode='markers')
     return trace
 
-
-
-#-----------------------------------------------------------------
-#Governing functions
-#-----------------------------------------------------------------
-def q_interchange_in(dh, L, d, w_in):
-    """
-    This function evaluates the magnitude that the difference in head has in the next head. How water flows.
-    """
-
-    num = (d**(5/2))*(dh**0.5) #**2.0)
-    den = L**0.5
-    q = w_in*(num/den)
-    
-    return q
-
-
-def q_interchange_out(dh, L, d, w_out):
-    """
-    This function evaluates the magnitude that the difference in head has in the next head. How water flows.
-    """
-
-    num = (d**(5/2))*(dh**0.5) #**2.0)
-    den = L**0.5
-    q = w_out*(num/den)
-    
-    return -q
-
-
-def q_rain(i, A_catch, w):
-    
-    q = w * i * A_catch
-    
-    return q
-
-def q_dwf(basevalue, hourly_mult, w):
-    
-    q = basevalue * hourly_mult * w
-    
-    return q
-
-
-# def psi(val, length, diameter):
-#     """
-#     This function evaluates the magnitude that the difference in head has in the next head. How water flows.
-#     """
-#     delta_t = 0.05 #related to the timestep
-#     # length = 0.2
-#     # diameter = 0.4
-    
-#     d5 = diameter**5
-    
-#     return delta_t*(val)**0.5
-
-def odd_transform(hj, hi, length, diameter, weight_in, weight_out):
-    """
-    Function that receives the difference in head and returns the change in head
-    """
-    
-    x = hj-hi
-    # odd_t = np.sign(x)*q_interchange(abs(x), length, diameter, weight)
-    
-    if x <= 0:
-        odd_t = q_interchange_out(abs(x), length, diameter, weight_out)
-    else:
-        odd_t = q_interchange_in(abs(x), length, diameter, weight_in)
-    
-    return odd_t
-
-
-
-# def rain_runoff(in_rain, a_catch):
-#     weight =0.1
-#     runoff = weight * in_rain * a_catch
-#     return runoff
-
-
-def pump_curve(m, b, depth):
-    
-    q_pump = max(b - m*depth**2, 0)
-    
-    return(q_pump)
-
-
-def pump_value(level, invert, prev_state):
-    
-    pump_curve_m = 0.2
-    pump_curve_b = 0.1
-    
-    on_level = 0.2 #1.0
-    off_level = 0.1  #0.5
-    
-    assert on_level>off_level
-    depth = level-invert
-    
-    pump_capacity = 0.4#pump_curve(pump_curve_m, pump_curve_b, depth) #0.4
-    
-    if depth > on_level:
-        value = pump_capacity
-        state = 1 #pump is on
-    elif depth < off_level:
-        value = 0
-        state = 0 #pump is off
-    
-    else:
-        if prev_state ==0:
-            value = 0
-            state = 0 #pump is off
-        else:
-            value = pump_capacity
-            state = 1 #pump is on
-    return value, state
 
 
 

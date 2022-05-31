@@ -12,8 +12,11 @@ import networkx as nx
 # dt = 1
 
 def difussion(G, original_h0):#, time, prev_state_pump):
-    
+    weight_in, weight_out = 0.65, 0.65
+    constant =0.005
     original_min = nx.get_node_attributes(G, 'elevation')
+    
+    
     new_h0= {}
     nodes_pump = [] #Nodes that have a pump
     outfalls = ['j_90552', 'j_90431']    #Nodes that are outfalls
@@ -37,11 +40,11 @@ def difussion(G, original_h0):#, time, prev_state_pump):
                 q_transfer =0
             else:
                 #In case there is valid gradient, this function calculates the change in head
-                q_transfer = 1#odd_transform(hj, hi, length, diameter, weight_in, weight_out)
+                q_transfer = odd_transform(hj, hi, float(length), float(diameter), weight_in, weight_out)
             
             # The total change is the influence of all the neighbors
-            total_dh += 0.2 #(q_transfer + q_rain(rain[time], original_A_catch[node], weight_rain) + q_dwf(original_basevalue_dwf[node], dwf_hourly[time%24], weight_dwf))*dt 
-            
+            total_dh += q_transfer - constant #(q_transfer + q_rain(rain[time], original_A_catch[node], weight_rain) + q_dwf(original_basevalue_dwf[node], dwf_hourly[time%24], weight_dwf))*dt 
+        # print(total_dh)
         #The new head cannot be under the minimimum level. Careful!! A node may be giving more than it has to offer.
         new_h0[node] = max(hi+total_dh, hi_min)
 

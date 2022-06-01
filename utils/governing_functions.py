@@ -1,59 +1,49 @@
 import networkx as nx
 
 
-# needed weights for the function (first attempts state)
-# weight_in= 0.65
-# weight_out=0.65
 
-
-# weight_rain = 0.0125 #0.0125
-# weight_dwf  = 0.05
-
-# dt = 1
-
-def difussion(G, original_h0):#, time, prev_state_pump):
-    weight_in, weight_out = 1.65, 1.65
+def predict_new__hydraulic_heads(G, original_h0):#, time, prev_state_pump):
+    
+    weight_in, weight_out = 0.65, 0.65
     constant =0.005
+    
     original_min = nx.get_node_attributes(G, 'elevation')
     
-    
     new_h0= {}
-    nodes_pump = [] #Nodes that have a pump
-    outfalls = ['j_90552', 'j_90431']    #Nodes that are outfalls
-    #Updates each node
-    for node, hi in original_h0.items():    
-        #links connected to that node
+    nodes_pump = []                         #Nodes that have a pump
+    outfalls = ['j_90552', 'j_90431']       #Nodes that are outfalls
+
+    for node, hi in original_h0.items():    #links connected to that node
+        
         hi_min = float(original_min[node])
         total_dh = 0
-        #Updates for each of the neighbors
-        for _, neigh in G.edges(node):
-            #Extract current heads
+        
+        for _, neigh in G.edges(node):      #Updates for each of the neighbors
             hj = original_h0[neigh]
             hj_min = float(original_min[neigh])
 
             #Extract edge attributes
-            length = G.edges[node, neigh]["length"]
-            diameter= G.edges[node, neigh]["geom_1"]
-
-            #if the heads are in their minimum, they cannot give water
-            if (hi == hi_min and hj<hi) or (hj==hj_min and hi<hj):
+            length = float(G.edges[node, neigh]["length"])
+            diameter= float(G.edges[node, neigh]["geom_1"])
+            
+            if is_giver_manhole_dry(hi, hi_min, hj, hj_min):     #if the heads are in their minimum, they cannot give water
                 q_transfer =0
-            else:
-                #In case there is valid gradient, this function calculates the change in head
-                q_transfer = odd_transform(hj, hi, float(length), float(diameter), weight_in, weight_out)
+            else:                           #In case there is valid gradient, this function calculates the change in head
+                q_transfer = calculate_q_transfer(hj, hi, length, diameter, weight_in, weight_out)
             
             # The total change is the influence of all the neighbors
-            total_dh += q_transfer #- constant #(q_transfer + q_rain(rain[time], original_A_catch[node], weight_rain) + q_dwf(original_basevalue_dwf[node], dwf_hourly[time%24], weight_dwf))*dt 
-        # print(total_dh)
-        #The new head cannot be under the minimimum level. Careful!! A node may be giving more than it has to offer.
-        new_h0[node] = max(hi+total_dh, hi_min)
+            total_dh += q_transfer - constant #(q_transfer + q_rain(rain[time], original_A_catch[node], weight_rain) + q_dwf(original_basevalue_dwf[node], dwf_hourly[time%24], weight_dwf))*dt 
+        
+        new_h0[node] = max(hi+total_dh, hi_min) #The new head cannot be under the minimimum level. Careful!! A node may be giving more than it has to offer.
 
     for node_outfalls in outfalls:
         new_h0[node_outfalls]=float(original_min[node_outfalls])
 
-
     return new_h0#, pump_state
 
+def is_giver_manhole_dry(hi, hi_min, hj, hj_min):
+    ans = (hi == hi_min and hj < hi) or (hj == hj_min and hi < hj)
+    return ans
 
 
 #-----------------------------------------------------------------
@@ -108,18 +98,17 @@ def q_dwf(basevalue, hourly_mult, w):
     
 #     return delta_t*(val)**0.5
 
-def odd_transform(hj, hi, length, diameter, weight_in, weight_out):
+def calculate_q_transfer(hj, hi, length, diameter, weight_in, weight_out):
     """
     Function that receives the difference in head and returns the change in head
     """
-    
-    x = hj-hi
+    dif = hj-hi
     # odd_t = np.sign(x)*q_interchange(abs(x), length, diameter, weight)
     
-    if x <= 0:
-        odd_t = q_interchange_out(abs(x), length, diameter, weight_out)
+    if dif <= 0:
+        odd_t = q_interchange_out(abs(dif), length, diameter, weight_out)
     else:
-        odd_t = q_interchange_in(abs(x), length, diameter, weight_in)
+        odd_t = q_interchange_in(abs(dif), length, diameter, weight_in)
     
     return odd_t
 

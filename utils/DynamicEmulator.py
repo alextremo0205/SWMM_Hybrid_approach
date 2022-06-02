@@ -1,9 +1,20 @@
+import torch
 import networkx as nx
 import utils.head_change_utils as utils
 
-w_in =0.65
-w_out = 0.65
-constant = 0.005
+
+def to_torch(object_to_convert):
+    return torch.tensor(float(object_to_convert), dtype=torch.float32)
+
+def dict_to_torch(d):
+    dict_torch = {k:to_torch(v) for k,v in d.items()}
+    return dict_torch
+
+
+w_in =      to_torch(0.65)
+w_out =     to_torch(0.65)
+constant =  to_torch(0.005)
+
 nodes_outfalls = ['j_90552', 'j_90431']
 
 class DynamicEmulator:
@@ -14,24 +25,26 @@ class DynamicEmulator:
         self.inp_lines = utils.get_lines_from_textfile(inp_path)
         self.G = utils.inp_to_G(self.inp_lines)
         
-        self.original_min = nx.get_node_attributes(self.G, 'elevation')
-        self.original_A_catch = nx.get_node_attributes(self.G, 'area_subcatchment')
+        self.original_min =     dict_to_torch( nx.get_node_attributes(self.G, 'elevation') )
+        self.original_A_catch = dict_to_torch( nx.get_node_attributes(self.G, 'area_subcatchment') )
+        self.h =                dict_to_torch(initial_h0)
+        
+        
         self.pos = nx.get_node_attributes(self.G, 'pos')
-
-        self.h = initial_h0
+        
         
     def draw_nx_layout(self):
         nx.draw(self.G, pos = self.pos, node_size=15)
 
     def get_depths_to_pd(self,timestep):
-        rows = [[timestep, node, depth - float(self.original_min[node]), self.pos[node][0], self.pos[node][1]] for node, depth in self.h.items()]
+        rows = [[timestep, node, (depth - self.original_min[node]).item(), self.pos[node][0], self.pos[node][1]] for node, depth in self.h.items()]
         return rows
 
     def get_h(self):
         return self.h
 
     def set_h(self, new_h):
-        self.h = new_h
+        self.h = dict_to_torch(new_h)
 
     def update_h(self):#, time, prev_state_pump):
         
@@ -41,18 +54,18 @@ class DynamicEmulator:
 
         for node, hi in self.h.items():    #links connected to that node
             
-            hi_min = float(self.original_min[node])
+            hi_min = self.original_min[node]
             
             total_dh = 0
             for _, neigh in self.G.edges(node):      #Updates for each of the neighbors
                 hj = self.h[neigh]
-                hj_min = float(self.original_min[neigh])
+                hj_min = self.original_min[neigh]
                 
                 #Extract edge attributes
                 link = self.G.edges[node, neigh]
 
                 if is_giver_manhole_dry(hi, hi_min, hj, hj_min):     #if the heads are in their minimum, they cannot give water
-                    q_transfer =0
+                    q_transfer =to_torch(0)
                 else:                                                   #In case there is valid gradient, this function calculates the change in head
                     q_transfer = calculate_q_transfer(hj, hi, link)
                 
@@ -71,6 +84,9 @@ def is_giver_manhole_dry(hi, hi_min, hj, hj_min):
     return ans
 
 
+
+
+
 #-----------------------------------------------------------------
 #Governing functions
 #-----------------------------------------------------------------
@@ -80,8 +96,8 @@ def calculate_q_transfer(hj, hi, link):
     """
     dif = hj-hi
     
-    length = float(link["length"])
-    diameter= float(link["geom_1"])
+    length = to_torch(link["length"])
+    diameter= to_torch(link["geom_1"])
 
     if dif <= 0:
         odd_t = q_interchange_out(abs(dif), length, diameter)

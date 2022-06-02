@@ -19,7 +19,7 @@ nodes_outfalls = ['j_90552', 'j_90431']
 
 class DynamicEmulator:
     
-    def __init__(self, inp_path, initial_h0):
+    def __init__(self, inp_path, initial_h0, q_transfer_ANN):
         assert type(initial_h0) == dict, "Depths should be a dictionary"
 
         self.inp_lines = utils.get_lines_from_textfile(inp_path)
@@ -29,7 +29,8 @@ class DynamicEmulator:
         self.original_A_catch = dict_to_torch( nx.get_node_attributes(self.G, 'area_subcatchment') )
         self.h =                dict_to_torch(initial_h0)
         
-        
+        self.q_transfer_ANN = q_transfer_ANN
+
         self.pos = nx.get_node_attributes(self.G, 'pos')
         
         
@@ -61,8 +62,8 @@ class DynamicEmulator:
                 if is_giver_manhole_dry(hi, hi_min, hj, hj_min):     #if the heads are in their minimum, they cannot give water
                     q_transfer =to_torch(0)
                 else:                                                   #In case there is valid gradient, this function calculates the change in head
-                    q_transfer = calculate_q_transfer(hj, hi, link)
-                
+                    q_transfer = self.calculate_q_transfer(hj, hi, link)
+                # print(q_transfer)
                 total_dh += q_transfer - constant #(q_transfer + q_rain(rain[time], original_A_catch[node], weight_rain) + q_dwf(original_basevalue_dwf[node], dwf_hourly[time%24], weight_dwf))*dt 
             
             new_h0[node] = max(hi+total_dh, hi_min) #The new head cannot be under the minimimum level. Careful!! A node may be giving more than it has to offer.
@@ -79,7 +80,19 @@ class DynamicEmulator:
         rows = [[timestep, node, (depth - self.original_min[node]).item(), self.pos[node][0], self.pos[node][1]] for node, depth in self.h.items()]
         return rows
 
-
+    def calculate_q_transfer(self, hj, hi, link):
+        """
+        Function that receives the difference in head and returns the change in head
+        """
+        dif = hj-hi
+        
+        length = to_torch(link["length"])
+        diameter= to_torch(link["geom_1"])
+        # print([dif, length, diameter])
+        x = torch.cat([dif, length, diameter])#.view(-1,3)
+        ans = self.q_transfer_ANN(x)
+        
+        return ans
 
 def is_giver_manhole_dry(hi, hi_min, hj, hj_min):
     ans = (hi == hi_min and hj < hi) or (hj == hj_min and hi < hj)
@@ -92,21 +105,7 @@ def is_giver_manhole_dry(hi, hi_min, hj, hj_min):
 #-----------------------------------------------------------------
 #Governing functions
 #-----------------------------------------------------------------
-def calculate_q_transfer(hj, hi, link):
-    """
-    Function that receives the difference in head and returns the change in head
-    """
-    dif = hj-hi
-    
-    length = to_torch(link["length"])
-    diameter= to_torch(link["geom_1"])
 
-    if dif <= 0:
-        odd_t = q_interchange_out(abs(dif), length, diameter)
-    else:
-        odd_t = q_interchange_in(abs(dif), length, diameter)
-    
-    return odd_t
 
 
 def q_interchange_in(dh, L, d):

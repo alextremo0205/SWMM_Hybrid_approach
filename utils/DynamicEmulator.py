@@ -14,6 +14,7 @@ def dict_to_torch(d):
 w_in =      to_torch(0.65)
 w_out =     to_torch(0.65)
 constant =  to_torch(0.005)
+constant = torch.reshape(constant, (1, 1))
 
 nodes_outfalls = ['j_90552', 'j_90431']
 
@@ -69,7 +70,7 @@ class DynamicEmulator:
             new_h0[node] = max(hi+total_dh, hi_min) #The new head cannot be under the minimimum level. Careful!! A node may be giving more than it has to offer.
 
         for node_outfalls in outfalls:
-            new_h0[node_outfalls]=float(self.original_min[node_outfalls])
+            new_h0[node_outfalls]=self.original_min[node_outfalls]
 
         self.h = new_h0
 
@@ -88,8 +89,14 @@ class DynamicEmulator:
         
         length = to_torch(link["length"])
         diameter= to_torch(link["geom_1"])
-        # print([dif, length, diameter])
-        x = torch.cat([dif, length, diameter])#.view(-1,3)
+        
+        dif =       torch.reshape(dif, (1, 1))
+        length =    torch.reshape(length, (1, 1))
+        diameter =  torch.reshape(diameter, (1, 1))
+
+        
+        x = torch.cat([dif, length, diameter], dim=1) 
+        # print(x)
         ans = self.q_transfer_ANN(x)
         
         return ans

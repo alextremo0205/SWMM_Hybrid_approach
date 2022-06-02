@@ -31,6 +31,7 @@ class DynamicEmulator:
         
         
         self.pos = nx.get_node_attributes(self.G, 'pos')
+<<<<<<< Updated upstream
         
         
     def draw_nx_layout(self):
@@ -39,6 +40,11 @@ class DynamicEmulator:
     def get_depths_to_pd(self,timestep):
         rows = [[timestep, node, (depth - self.original_min[node]).item(), self.pos[node][0], self.pos[node][1]] for node, depth in self.h.items()]
         return rows
+=======
+
+        self.h = initial_h0
+    
+>>>>>>> Stashed changes
 
     def get_h(self):
         return self.h
@@ -77,6 +83,17 @@ class DynamicEmulator:
             new_h0[node_outfalls]=float(self.original_min[node_outfalls])
 
         self.h = new_h0
+    
+
+    def get_depths_to_pd(self,timestep):
+        rows = [[timestep, node, depth - float(self.original_min[node]), self.pos[node][0], self.pos[node][1]] for node, depth in self.h.items()]
+        return rows
+    
+    def draw_nx_layout(self):
+        nx.draw(self.G, pos = self.pos, node_size=15)
+
+
+
 
 
 def is_giver_manhole_dry(hi, hi_min, hj, hj_min):

@@ -1,4 +1,5 @@
 import torch
+import numpy as np
 import networkx as nx
 import utils.head_change_utils as utils
 
@@ -61,16 +62,19 @@ class DynamicEmulator:
                 link = self.G.edges[node, neigh]
 
                 if is_giver_manhole_dry(hi, hi_min, hj, hj_min):     #if the heads are in their minimum, they cannot give water
-                    q_transfer =to_torch(0)
+                    q_transfer = torch.zeros(1, 1)
                 else:                                                   #In case there is valid gradient, this function calculates the change in head
                     q_transfer = self.calculate_q_transfer(hj, hi, link)
-                # print(q_transfer)
+                    
+                
                 total_dh += q_transfer - constant #(q_transfer + q_rain(rain[time], original_A_catch[node], weight_rain) + q_dwf(original_basevalue_dwf[node], dwf_hourly[time%24], weight_dwf))*dt 
             
+            hi_min = torch.reshape(hi_min, (1, 1))
             new_h0[node] = max(hi+total_dh, hi_min) #The new head cannot be under the minimimum level. Careful!! A node may be giving more than it has to offer.
 
         for node_outfalls in outfalls:
-            new_h0[node_outfalls]=self.original_min[node_outfalls]
+            min_outfall=self.original_min[node_outfalls]
+            new_h0[node_outfalls] = torch.reshape(min_outfall, (1,1))
 
         self.h = new_h0
 

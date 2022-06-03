@@ -29,13 +29,40 @@ class DynamicEmulator:
         
         self.original_min =     dict_to_torch( nx.get_node_attributes(self.G, 'elevation') )
         self.original_A_catch = dict_to_torch( nx.get_node_attributes(self.G, 'area_subcatchment') )
+        
         self.h =                dict_to_torch(initial_h0)
+        
+        self.set_normalized_length()
+        self.set_normalized_geom_1()
+        
         
         self.q_transfer_ANN = q_transfer_ANN
 
         self.pos = nx.get_node_attributes(self.G, 'pos')
+
+    def set_normalized_length(self):
+        length_dict = nx.get_edge_attributes(self.G, 'length')
+        all_lengths = np.array([float(i) for i in list(length_dict.values())])
+        self.max_length, self.min_length = all_lengths.max(), all_lengths.min()
         
+        normalized_length = {k:self.normalize_length(float(v)) for k,v in length_dict.items()}
+        nx.set_edge_attributes(self.G, normalized_length, name = 'normalized_length')
+
+    def normalize_length(self, length):
+        return (length - self.min_length) / (self.max_length-self.min_length)
+
+
+    def set_normalized_geom_1(self):
+        geom_1_dict = nx.get_edge_attributes(self.G, 'geom_1')
+        all_geom_1 = np.array([float(i) for i in list(geom_1_dict.values())])
+        self.max_geom_1, self.min_geom_1 = all_geom_1.max(), all_geom_1.min()
         
+        normalized_geom_1 = {k:self.normalize_geom_1(float(v)) for k,v in geom_1_dict.items()}
+        nx.set_edge_attributes(self.G, normalized_geom_1, name = 'normalized_geom_1')
+
+    def normalize_geom_1(self, geom_1):
+        return (geom_1 - self.min_geom_1) / (self.max_geom_1-self.min_geom_1)
+
 
     def get_h(self):
         return self.h
@@ -81,8 +108,12 @@ class DynamicEmulator:
     def draw_nx_layout(self):
         nx.draw(self.G, pos = self.pos, node_size=15)
 
-    def get_depths_to_pd(self,timestep):
+    def get_depths_to_rows(self,timestep):
         rows = [[timestep, node, (depth - self.original_min[node]).item(), self.pos[node][0], self.pos[node][1]] for node, depth in self.h.items()]
+        return rows
+
+    def get_custom_depths_to_rows(self,timestep, custom_h):
+        rows = [[timestep, node, (depth - self.original_min[node]).item(), self.pos[node][0], self.pos[node][1]] for node, depth in custom_h.items()]
         return rows
 
     def calculate_q_transfer(self, hj, hi, link):
@@ -91,8 +122,8 @@ class DynamicEmulator:
         """
         dif = hj-hi
         
-        length = to_torch(link["length"])
-        diameter= to_torch(link["geom_1"])
+        length = to_torch(link["normalized_length"])
+        diameter= to_torch(link["normalized_geom_1"])
         
         dif =       torch.reshape(dif, (1, 1))
         length =    torch.reshape(length, (1, 1))
@@ -100,7 +131,7 @@ class DynamicEmulator:
 
         
         x = torch.cat([dif, length, diameter], dim=1) 
-        # print(x)
+        
         ans = self.q_transfer_ANN(x)
         
         return ans
@@ -116,8 +147,6 @@ def is_giver_manhole_dry(hi, hi_min, hj, hj_min):
 #-----------------------------------------------------------------
 #Governing functions
 #-----------------------------------------------------------------
-
-
 
 def q_interchange_in(dh, L, d):
     """

@@ -38,12 +38,21 @@ def get_h0_h1_couples(heads_timeseries):
         h0 = heads_timeseries.iloc[i,:].to_dict()
         h1 = heads_timeseries.iloc[i+1,:].to_dict()
 
-        h0_sample, h1_sample = h0, h1
-
-        h0_samples.append(h0_sample)
-        h1_samples.append(h1_sample)
+        h0_samples.append(h0)
+        h1_samples.append(h1)
         
     return h0_samples, h1_samples
+
+
+def get_rolled_out_target_hydraulic_heads(heads_timeseries):
+    
+    rolled_out_target_hydraulic_heads = []
+    
+    for i in range(len(heads_timeseries)):
+        h = heads_timeseries.iloc[i,:].to_dict()
+        rolled_out_target_hydraulic_heads.append(h)
+        
+    return rolled_out_target_hydraulic_heads
 
 
 def get_max_and_min(list_of_samples):
@@ -294,26 +303,48 @@ def get_subcatchments(lines, inp_dict):
         line = lines[index]
     return subcathments
 
-# def get_subcatchments_phonebook(G):
-#     name_dict = nx.get_node_attributes(G, 'name')
-#     name_tuple = {name_dict[k] : k for k in name_dict}
-#     return name_tuple
+
 
 
 # Plotting ---------------------------------------------------
+
+
+
+
+def plot_head_changes(node_name, single_node_x, single_node_y):
+    fig = go.Figure()
+    scatter_one_node_x_y= get_scatter_trace(single_node_x, single_node_y)
+    fig.add_trace(scatter_one_node_x_y)
+
+    fig.update_yaxes(
+        scaleanchor = "x",
+        scaleratio = 1,
+    )
+    fig.update_layout(
+        width = 500,
+        height = 500,
+        title = "%s Head changes" % (node_name)
+    )
+
+    fig.update_layout(
+            shapes=[
+                dict(
+                    type= 'line',
+                    y0= 0, 
+                    y1= 1, 
+                    x0= 0, 
+                    x1= 1
+                )
+            ])
+    return fig
+
 
 def get_scatter_trace(x, y):
     trace = go.Scatter(x=x, y=y, mode='markers')
     return trace
 
-
-
-
 #-----------------------------------------------------------------
 #-----------------------------------------------------------------
-
-
-
 
 ##
 def is_it_ready():

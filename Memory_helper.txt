@@ -1,0 +1,5 @@
+Consider the invert offsets!
+
+Consider two different networks depending on the pipe section.
+(One for the EGG and other for the CIRCLE)
+

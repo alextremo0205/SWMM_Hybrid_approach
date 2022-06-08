@@ -35,9 +35,8 @@ class DynamicEmulator:
         self.set_normalized_length()
         self.set_normalized_geom_1()
         
-        
         self.q_transfer_ANN = q_transfer_ANN
-
+        
         self.pos = nx.get_node_attributes(self.G, 'pos')
 
     def set_normalized_length(self):

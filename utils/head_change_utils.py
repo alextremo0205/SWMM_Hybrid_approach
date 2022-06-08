@@ -31,18 +31,37 @@ def get_rain_in_pandas(rain_path):
     return rainfall_raw_data
 
 
-def get_h0_h1_couples(heads_timeseries):
-    h0_samples = []
-    h1_samples = []
-    for i in range(len(heads_timeseries)-1):
-        h0 = heads_timeseries.iloc[i,:].to_dict()
-        h1 = heads_timeseries.iloc[i+1,:].to_dict()
+def get_dry_periods_index(rainfall_raw_data):
+    indexes = np.array(rainfall_raw_data[rainfall_raw_data['value']==0].index)
+    differences = np.diff(indexes)
 
-        h0_samples.append(h0)
-        h1_samples.append(h1)
+    dry_periods_index = []
+    single_dry_period_indexes = []
+    for i, j in enumerate(differences):
+        if j==1:
+            single_dry_period_indexes.append(i)
+        else:
+            dry_periods_index.append(single_dry_period_indexes)
+            single_dry_period_indexes = []
+    
+    return dry_periods_index
+
+
+def get_h0_ht_couples(heads_timeseries, steps_ahead):
+    couples =[]
+    
+    for i in range(len(heads_timeseries)-steps_ahead):
+        h0_samples = heads_timeseries.iloc[i,:].to_dict()
         
-    return h0_samples, h1_samples
+        ht_samples = []
+        for j in range(steps_ahead):
+            ht = heads_timeseries.iloc[i+j+1,:].to_dict()
+            ht_samples.append(ht)
 
+        couple=(h0_samples, ht_samples)
+        couples.append(couple)
+
+    return couples
 
 def get_rolled_out_target_hydraulic_heads(heads_timeseries):
     
@@ -83,6 +102,11 @@ def normalize_sample_values(list_of_samples, max = None, min = None):
         normalized_samples.append(normalized_sample)
 
     return normalized_samples
+
+
+
+
+
 
 
 

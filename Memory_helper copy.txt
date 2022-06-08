@@ -2,7 +2,10 @@ Side by side comparisons. Original, prediction, error.
 
 Multiple rainfall events.
 
-(Maybe consider rainfall included)
+Runoff instead of rainfall
+
+Performance metrics. Calculate the error of the time series as Elvin in Bishwadeep's presentation.
+Statistics:    Number of parameters. Number of training examples.
 
 Check Saint-Vennant equations.
 

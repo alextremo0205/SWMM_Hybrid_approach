@@ -47,18 +47,24 @@ def get_dry_periods_index(rainfall_raw_data):
     return dry_periods_index
 
 
-def get_h0_ht_couples(heads_timeseries, steps_ahead):
+def get_x0_ht_couples(rainfall_raw_data, heads_timeseries, steps_ahead):
     couples =[]
-    
     for i in range(len(heads_timeseries)-steps_ahead):
+
         h0_samples = heads_timeseries.iloc[i,:].to_dict()
         
+        rt_samples = [rainfall_raw_data.iloc[i].value]     
         ht_samples = []
-        for j in range(steps_ahead):
+        for j in range(steps_ahead):    
             ht = heads_timeseries.iloc[i+j+1,:].to_dict()
             ht_samples.append(ht)
+            
+            rt = rainfall_raw_data.iloc[i+j+1].value
+            rt_samples.append(rt)
 
-        couple=(h0_samples, ht_samples)
+        x0_samples = [rt_samples, h0_samples]
+
+        couple=(x0_samples, ht_samples)
         couples.append(couple)
 
     return couples
@@ -74,53 +80,58 @@ def get_rolled_out_target_hydraulic_heads(heads_timeseries):
     return rolled_out_target_hydraulic_heads
 
 
-def get_max_and_min(samples_x, list_samples_y):
-    samples_final = []
-    samples_final.extend(samples_x)
-    for i in list_samples_y:
-        samples_final+=i
-    
-    max = np.array(list(samples_final[0].values())).max()
-    min = np.array(list(samples_final[0].values())).min()
 
-    for sample in samples_final:
-        val_max = np.array(list(sample.values())).max()
-        val_min = np.array(list(sample.values())).min()
-        if val_max>max:
-            max = val_max
-        if val_min<min:
-            min = val_min
-
-    return max, min
 
 def normalize_min_max(value, max,min):
     return (value - min)/(max-min)
 
-def normalize_sample_values(list_of_samples, max = None, min = None):
-    if max == None and min == None:
-        max, min = get_max_and_min(list_of_samples)
 
-    
-    normalized_samples = []
-    for sample in list_of_samples:
-        normalized_sample = dict(map(lambda x: (x[0], normalize_min_max(x[1], max, min )), sample.items()))
-        normalized_samples.append(normalized_sample)
+# max, min = utils.get_max_and_min(X_train, y_train)
+class Normalizer:
+    def __init__(self, X_train, y_train):
+        self.initial_heads = [i[1] for i in X_train]
+        self.y_train = y_train
+        self.max_h, self.min_h = self.get_max_and_min_h()
+        self.normalized_h0_in_x = self.normalize_x_heads()
+        self.normalized_ht_in_y = self.normalize_y_heads()
 
-    return normalized_samples
+    def get_max_and_min_h(self):
+        samples_final = []
+        samples_final.extend(self.initial_heads)
+        
+        for i in self.y_train:
+            samples_final+=i
+        
+        max = np.array(list(samples_final[0].values())).max()
+        min = np.array(list(samples_final[0].values())).min()
 
+        for sample in samples_final:
+            val_max = np.array(list(sample.values())).max()
+            val_min = np.array(list(sample.values())).min()
+            if val_max>max:
+                max = val_max
+            if val_min<min:
+                min = val_min
 
-def normalize_sample_values_y(list_of_samples, max = None, min = None):
-    if max == None and min == None:
-        max, min = get_max_and_min(list_of_samples)
+        return max, min
 
-    normalized_list = []
-    for heads_in_step in list_of_samples:
+    def normalize_x_heads(self):       
         normalized_samples = []
-        for sample in heads_in_step:
-            normalized_sample = dict(map(lambda x: (x[0], normalize_min_max(x[1], max, min )), sample.items()))
+        for sample in self.initial_heads:
+            normalized_sample = dict(map(lambda x: (x[0], normalize_min_max(x[1], self.max_h, self.min_h )), sample.items()))
             normalized_samples.append(normalized_sample)
-        normalized_list.append(normalized_samples)
-    return normalized_list
+        return normalized_samples
+
+
+    def normalize_y_heads(self):
+        normalized_list = []
+        for heads_in_step in self.y_train:
+            normalized_samples = []
+            for sample in heads_in_step:
+                normalized_sample = dict(map(lambda x: (x[0], normalize_min_max(x[1], self.max_h, self.min_h )), sample.items()))
+                normalized_samples.append(normalized_sample)
+            normalized_list.append(normalized_samples)
+        return normalized_list
 
 
 

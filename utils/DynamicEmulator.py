@@ -39,6 +39,8 @@ class DynamicEmulator:
         
         self.pos = nx.get_node_attributes(self.G, 'pos')
 
+        self.time = 0
+
     def set_normalized_length(self):
         length_dict = nx.get_edge_attributes(self.G, 'length')
         all_lengths = np.array([float(i) for i in list(length_dict.values())])
@@ -90,10 +92,10 @@ class DynamicEmulator:
                 if is_giver_manhole_dry(hi, hi_min, hj, hj_min):     #if the heads are in their minimum, they cannot give water
                     q_transfer = torch.zeros(1, 1)
                 else:                                                   #In case there is valid gradient, this function calculates the change in head
-                    q_transfer = self.calculate_q_transfer(hj, hi, link)
+                    q_transfer = self.calculate_dh_transfer(hj, hi, link)
                     
                 
-                total_dh += q_transfer - constant #(q_transfer + q_rain(rain[time], original_A_catch[node], weight_rain) + q_dwf(original_basevalue_dwf[node], dwf_hourly[time%24], weight_dwf))*dt 
+                total_dh += q_transfer + self.calculate_dh_runoff(node) #(q_transfer + q_rain(rain[time], original_A_catch[node], weight_rain) + q_dwf(original_basevalue_dwf[node], dwf_hourly[time%24], weight_dwf))*dt 
             
             hi_min = torch.reshape(hi_min, (1, 1))
             new_h0[node] = max(hi+total_dh, hi_min) #The new head cannot be under the minimimum level. Careful!! A node may be giving more than it has to offer.
@@ -115,7 +117,7 @@ class DynamicEmulator:
         rows = [[timestep, node, (depth - self.original_min[node]).item(), self.pos[node][0], self.pos[node][1]] for node, depth in custom_h.items()]
         return rows
 
-    def calculate_q_transfer(self, hj, hi, link):
+    def calculate_dh_transfer(self, hj, hi, link):
         """
         Function that receives the difference in head and returns the change in head
         """
@@ -134,6 +136,13 @@ class DynamicEmulator:
         ans = self.q_transfer_ANN(x)
         
         return ans
+
+    def calculate_dh_runoff(self,node):
+        
+        
+        
+        pass
+
 
 def is_giver_manhole_dry(hi, hi_min, hj, hj_min):
     ans = (hi == hi_min and hj < hi) or (hj == hj_min and hi < hj)

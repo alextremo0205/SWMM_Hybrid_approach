@@ -7,9 +7,8 @@ import calendar
 import plotly.graph_objects as go
 import plotly.express as px
 
-# import pickle
 import swmmtoolbox.swmmtoolbox as swm
-# import subprocess
+
 
 import networkx as nx
 
@@ -160,28 +159,7 @@ def get_lines_from_textfile(path):
 
 
 
-# def datetime_range(start, end, delta):
-#     current = start
-#     while current < end:
-#         yield current
-#         current += delta
 
- 
-# def keep_time():
-#   # keep_times stores the used time stamps.
-#   keep_times =[]
-#   for month in range(1,13):
-      
-#       end_day = calendar.monthrange(2014, month)[1]
-#       date_gen = datetime_range(datetime(2014, month, 1, 0), datetime(2014, month, end_day, 23, 55), timedelta(minutes=5))
-      
-#       for i in date_gen:
-#           time_i = [i.year, i.month, i.day, i.hour, i.minute] #, date_gen.day, date_gen.hour, date_ gen.minute]
-#           time_i = ["{0:0=2d}".format(value) for value in time_i] 
-#           time_i = "".join(time_i)
-#           keep_times.append(time_i)
-
-#   return(keep_times)
 
 # Plotting --------------------------------------------------------------------------------------------------------
 def hietograph(rain):

@@ -74,12 +74,16 @@ def get_rolled_out_target_hydraulic_heads(heads_timeseries):
     return rolled_out_target_hydraulic_heads
 
 
-def get_max_and_min(list_of_samples):
+def get_max_and_min(samples_x, list_samples_y):
+    samples_final = []
+    samples_final.extend(samples_x)
+    for i in list_samples_y:
+        samples_final+=i
     
-    max = np.array(list(list_of_samples[0].values())).max()
-    min = np.array(list(list_of_samples[0].values())).min()
+    max = np.array(list(samples_final[0].values())).max()
+    min = np.array(list(samples_final[0].values())).min()
 
-    for sample in list_of_samples:
+    for sample in samples_final:
         val_max = np.array(list(sample.values())).max()
         val_min = np.array(list(sample.values())).min()
         if val_max>max:
@@ -96,6 +100,7 @@ def normalize_sample_values(list_of_samples, max = None, min = None):
     if max == None and min == None:
         max, min = get_max_and_min(list_of_samples)
 
+    
     normalized_samples = []
     for sample in list_of_samples:
         normalized_sample = dict(map(lambda x: (x[0], normalize_min_max(x[1], max, min )), sample.items()))
@@ -104,7 +109,18 @@ def normalize_sample_values(list_of_samples, max = None, min = None):
     return normalized_samples
 
 
+def normalize_sample_values_y(list_of_samples, max = None, min = None):
+    if max == None and min == None:
+        max, min = get_max_and_min(list_of_samples)
 
+    normalized_list = []
+    for heads_in_step in list_of_samples:
+        normalized_samples = []
+        for sample in heads_in_step:
+            normalized_sample = dict(map(lambda x: (x[0], normalize_min_max(x[1], max, min )), sample.items()))
+            normalized_samples.append(normalized_sample)
+        normalized_list.append(normalized_samples)
+    return normalized_list
 
 
 

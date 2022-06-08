@@ -73,10 +73,10 @@ class DynamicEmulator:
     def update_h(self):#, time, prev_state_pump):
         
         new_h0= {}
-        nodes_pump = []                         #Nodes that have a pump
-        outfalls = nodes_outfalls       #Nodes that are outfalls
+        nodes_pump = []                         
+        outfalls = nodes_outfalls               
 
-        for node, hi in self.h.items():    #links connected to that node
+        for node, hi in self.h.items():         #links connected to that node
             
             hi_min = self.original_min[node]
             

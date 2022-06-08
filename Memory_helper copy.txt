@@ -1,4 +1,8 @@
-Side by side comparisons
+Side by side comparisons. Original, prediction, error.
+
+Multiple rainfall events.
+
+(Maybe consider rainfall included)
 
 Check Saint-Vennant equations.
 
@@ -8,3 +12,5 @@ Consider two different networks depending on the pipe section.
 (One for the EGG and other for the CIRCLE)
 
 Heun or Runge-Kutta approach.
+
+Metrics of performance.

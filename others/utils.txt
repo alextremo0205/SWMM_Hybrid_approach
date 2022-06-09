@@ -86,7 +86,7 @@ def normalize_min_max(value, max,min):
     return (value - min)/(max-min)
 
 
-
+# max, min = utils.get_max_and_min(X_train, y_train)
 class Normalizer:
     def __init__(self, X_train, y_train):
         self.initial_heads = [i[1] for i in X_train]

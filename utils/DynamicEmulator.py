@@ -72,6 +72,8 @@ class DynamicEmulator:
     def set_h(self, new_h):
         self.h = dict_to_torch(new_h)
 
+
+
     def update_h(self, rain):#, time, prev_state_pump):
         
         new_h0= {}

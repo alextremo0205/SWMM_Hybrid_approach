@@ -21,8 +21,8 @@ nodes_outfalls = ['j_90552', 'j_90431']
 
 class DynamicEmulator:
     
-    def __init__(self, inp_path, initial_h0, q_transfer_ANN):
-        assert type(initial_h0) == dict, "Depths should be a dictionary"
+    def __init__(self, inp_path, q_transfer_ANN, q_runoff_ANN):
+        # assert type(initial_h0) == dict, "Depths should be a dictionary"
 
         self.inp_lines = utils.get_lines_from_textfile(inp_path)
         self.G = utils.inp_to_G(self.inp_lines)
@@ -30,12 +30,13 @@ class DynamicEmulator:
         self.original_min =     dict_to_torch( nx.get_node_attributes(self.G, 'elevation') )
         self.original_A_catch = dict_to_torch( nx.get_node_attributes(self.G, 'area_subcatchment') )
         
-        self.h =                dict_to_torch(initial_h0)
+        # self.h =                dict_to_torch(initial_h0)
         
         self.set_normalized_length()
         self.set_normalized_geom_1()
         
         self.q_transfer_ANN = q_transfer_ANN
+        self.q_runoff_ANN = q_runoff_ANN
         
         self.pos = nx.get_node_attributes(self.G, 'pos')
 
@@ -71,7 +72,7 @@ class DynamicEmulator:
     def set_h(self, new_h):
         self.h = dict_to_torch(new_h)
 
-    def update_h(self):#, time, prev_state_pump):
+    def update_h(self, rain):#, time, prev_state_pump):
         
         new_h0= {}
         nodes_pump = []                         
@@ -93,9 +94,13 @@ class DynamicEmulator:
                     q_transfer = torch.zeros(1, 1)
                 else:                                                   #In case there is valid gradient, this function calculates the change in head
                     q_transfer = self.calculate_dh_transfer(hj, hi, link)
-                    
                 
-                total_dh += q_transfer + self.calculate_dh_runoff(node) #(q_transfer + q_rain(rain[time], original_A_catch[node], weight_rain) + q_dwf(original_basevalue_dwf[node], dwf_hourly[time%24], weight_dwf))*dt 
+                if rain==0:
+                    q_rain = torch.zeros(1, 1)
+                else:
+                    q_rain = self.calculate_dh_runoff(rain)    
+                
+                total_dh += q_transfer + q_rain #(q_transfer + q_rain(rain[time], original_A_catch[node], weight_rain) + q_dwf(original_basevalue_dwf[node], dwf_hourly[time%24], weight_dwf))*dt 
             
             hi_min = torch.reshape(hi_min, (1, 1))
             new_h0[node] = max(hi+total_dh, hi_min) #The new head cannot be under the minimimum level. Careful!! A node may be giving more than it has to offer.
@@ -137,11 +142,14 @@ class DynamicEmulator:
         
         return ans
 
-    def calculate_dh_runoff(self,node):
+    def calculate_dh_runoff(self,rain):
+        rain = to_torch(rain)
+        rain = torch.reshape(rain, (1, 1))
+        ans = self.q_runoff_ANN(rain)
+        
+        return ans
         
         
-        
-        pass
 
 
 def is_giver_manhole_dry(hi, hi_min, hj, hj_min):

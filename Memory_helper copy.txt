@@ -1,3 +1,5 @@
+Unnormalize NN values when adding up to the node depth. 
+
 Side by side comparisons. Original, prediction, error.
 
 Multiple rainfall events.

@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 import plotly.graph_objects as go
-
+import plotly.express as px
 
 def load_yaml(yaml_path):
     with open(yaml_path) as f:
@@ -394,6 +394,19 @@ def get_scatter_trace(x, y):
     trace = go.Scatter(x=x, y=y, mode='markers')
     return trace
 
+def animate_nodal_depth(df):
+    net = px.scatter(
+        df, 
+        x="x_coord", 
+        y="y_coord", 
+        size="Depth", 
+        animation_frame="Time", 
+        size_max=20, 
+        hover_name="Node",
+        width=500, 
+        height=800
+        )
+    return net
 #-----------------------------------------------------------------
 #-----------------------------------------------------------------
 

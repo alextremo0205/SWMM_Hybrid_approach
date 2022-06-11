@@ -77,6 +77,7 @@ class DynamicEmulator:
     def update_h(self, rain):#, time, prev_state_pump):
         
         new_h0= {}
+        new_h0_2= {}
         nodes_pump = []                         
         outfalls = nodes_outfalls               
 
@@ -110,6 +111,42 @@ class DynamicEmulator:
         for node_outfalls in outfalls:
             min_outfall=self.original_min[node_outfalls]
             new_h0[node_outfalls] = torch.reshape(min_outfall, (1,1))
+
+        # for node, hi in new_h0.items():         #links connected to that node
+            
+        #     hi_min = self.original_min[node]
+            
+        #     total_dh = 0
+        #     for _, neigh in self.G.edges(node):      #Updates for each of the neighbors
+        #         hj = new_h0[neigh]
+        #         hj_min = self.original_min[neigh]
+                
+        #         #Extract edge attributes
+        #         link = self.G.edges[node, neigh]
+
+        #         if is_giver_manhole_dry(hi, hi_min, hj, hj_min):     #if the heads are in their minimum, they cannot give water
+        #             q_transfer = torch.zeros(1, 1)
+        #         else:                                                   #In case there is valid gradient, this function calculates the change in head
+        #             q_transfer = self.calculate_dh_transfer(hj, hi, link)
+                
+        #         if rain==0:
+        #             q_rain = torch.zeros(1, 1)
+        #         else:
+        #             q_rain = self.calculate_dh_runoff(rain)    
+                
+        #         total_dh += q_transfer + q_rain #(q_transfer + q_rain(rain[time], original_A_catch[node], weight_rain) + q_dwf(original_basevalue_dwf[node], dwf_hourly[time%24], weight_dwf))*dt 
+            
+        #     hi_min = torch.reshape(hi_min, (1, 1))
+        #     new_h0_2[node] = max(hi+total_dh, hi_min) #The new head cannot be under the minimimum level. Careful!! A node may be giving more than it has to offer.
+
+        # for node_outfalls in outfalls:
+        #     min_outfall=self.original_min[node_outfalls]
+        #     new_h0_2[node_outfalls] = torch.reshape(min_outfall, (1,1))
+
+
+        # final_h0 = {}
+        # for k,v in new_h0_2.items():
+        #     final_h0[k] = (new_h0[k]+new_h0_2[k])/2
 
         self.h = new_h0
 

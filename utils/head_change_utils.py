@@ -30,6 +30,21 @@ def get_rain_in_pandas(rain_path):
     rainfall_raw_data = rainfall_raw_data[:-1] #Drop last row to syncronize it with heads 
     return rainfall_raw_data
 
+def get_heads_from_pickle(path):
+    head_raw_data = get_info_from_pickle(path)
+    head_raw_data.columns = head_raw_data.columns.str.replace("_Hydraulic_head", "")
+    head_raw_data.columns = head_raw_data.columns.str.replace("node_", "")
+    return head_raw_data
+
+
+def get_runoff_from_pickle(path):
+    #This code assumes that each node has a subcatchment attached to it
+    #and node and subcatchment have the same id number.
+    runoff_raw_data = get_info_from_pickle(path)
+    runoff_raw_data.columns = runoff_raw_data.columns.str.replace("_Runoff_rate", "")
+    runoff_raw_data.columns = runoff_raw_data.columns.str.replace("subcatchment_sub", "j")
+    return runoff_raw_data
+
 
 def get_dry_periods_index(rainfall_raw_data):
     indexes = np.array(rainfall_raw_data[rainfall_raw_data['value']==0].index)

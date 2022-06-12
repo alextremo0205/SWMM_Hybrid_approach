@@ -1,12 +1,26 @@
 # Dataset configuration
 {
-# networks names
-dataset_names : [],
 
-# number of samples
-n_samples : [10000],
+# Directories
+rainfall_dats_directory: 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\rainfall_dats',
 
-# Rain parameters
+simulations_directory: 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations',
+
+real_rainfall_pickles_directory: 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\real_rainfalls', 
+
+inp_directory: 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\networks\Tuindorp_Right_Part.inp',
+
+
+#Synthetic rainfalls
+n_synthetic_rainfalls: 10,
+
+# block_values:    [ 0, 20,  0, 30,  0, 40,  0, 30,  0, 20,  0, 10,  0],
+# block_durations: [30, 30, 30, 30, 40, 30, 40, 30, 30, 30, 30, 30, 50],
+block_values: [0, 20, 0],
+block_durations: [20, 60, 90],
+
+#Real rains
+n_real_rains: 10,
 
 
 }

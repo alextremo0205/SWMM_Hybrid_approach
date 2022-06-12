@@ -1,0 +1,31 @@
+Unnormalize NN values when adding up to the node depth. 
+
+Side by side comparisons. Original, prediction, error.
+
+Multiple rainfall events.
+
+Runoff instead of rainfall
+
+Performance metrics. Calculate the error of the time series as Elvin in Bishwadeep's presentation.
+Statistics:    Number of parameters. Number of training examples.
+
+Check Saint-Vennant equations.
+
+Consider the invert offsets.
+
+Consider two different networks depending on the pipe section.
+(One for the EGG and other for the CIRCLE)
+
+Heun or Runge-Kutta approach.
+
+Metrics of performance.
+
+
+
+
+
+Annotations:
+01:39 12/06/2022
+The time for running the simulations in SWMM (1 block rainfall, 10 synthetic cases, 10 real cases with intensity bigger than 10) was 5 minutes, 19 seconds
+
+I removed the DWF information from the inp file.

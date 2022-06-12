@@ -25,5 +25,6 @@ yaml_data = utils.load_yaml(yaml_path)
 # Directories
 simulations_path = yaml_data['simulations_path']
 inp_path =  yaml_data['inp_path']
-rain_path = simulations_path + '\\block' + '\\block.dat'
-heads_path = simulations_path + '\\block' + '\\rainblock_head_TuindorpRP.pk'
+rain_path = simulations_path + '\\block_0' + '\\block_0.dat'
+heads_path = simulations_path + '\\block_0' + '\\hydraulic_head.pk'
+runoff_path = simulations_path + '\\block_0' + '\\runoff.pk'

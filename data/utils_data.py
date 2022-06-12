@@ -1,11 +1,13 @@
 import os
 import yaml
+import pickle
 import datetime
 import subprocess
 import numpy as np
 
 import plotly.graph_objects as go
 
+import swmmtoolbox.swmmtoolbox as swm
 
 def import_config_from_yaml(config_file):
     '''
@@ -94,11 +96,8 @@ def altblocks(idf,dur,dt, dur_padding=60):
 
 
 def rain_blocks(values, durations, dt):
-    # values = [10, 20, 30, 0]
     values = np.array(values)
-    # durations = [20, 20, 20, 40]
     durations = np.array(durations)
-    dt = 5
     dur = np.sum(durations)
     aDur = np.arange(dt,dur+dt,dt)    # in minutes
     aDur_time = list(map(conv_time, aDur))
@@ -122,7 +121,7 @@ def new_rain_lines(rainfall_dict, name_new_rain = 'name_new_rain'):
     year = key[:4]
     month = key[4:6]
     day = key[6:8]
-    date =  month + '/' + day + '/' + year #Month / day / year because of the inp format
+    date =  month + '/' + day + '/' + year #Month / day / year (because of the inp format)
      
     time = key[8:10]+":"+key[10:12]
 
@@ -156,9 +155,6 @@ def new_rain_lines(rainfall_dict, name_new_rain = 'name_new_rain', day='1/1/2019
   for key, value in rainfall_dict.items():
     new_lines_rainfall.append(tabulator([name_new_rain, day, key, str(value)])) #STA01  2004  6  12  00  00  0.12
 
-
-    # new_lines_rainfall.append(tabulator([name_new_rain, day, key, str(value)])) #before
-
   return new_lines_rainfall
 
 
@@ -170,8 +166,6 @@ def new_rain_lines_dat(rainfall_dict, name_new_rain = 'name_new_rain', day='1', 
     hour, minute = key.split(':')
     new_lines_rainfall.append(tabulator([name_new_rain, year, month, day, hour, minute, str(value)])) #STA01  2004  6  12  00  00  0.12
 
-
-    # new_lines_rainfall.append(tabulator([name_new_rain, day, key, str(value)])) #before
 
   return new_lines_rainfall
 
@@ -187,8 +181,6 @@ def get_new_rain_lines_real(rainfall_dict, name_new_rain = 'name_new_rain'):#, d
     new_lines_rainfall.append(tabulator([name_new_rain, year, month, day, hour, minute, str(value)])) #STA01  2004  6  12  00  00  0.12
 
 
-    # new_lines_rainfall.append(tabulator([name_new_rain, day, key, str(value)])) #before
-
   return new_lines_rainfall
 
 
@@ -199,9 +191,8 @@ def get_lines_from_textfile(path):
   return lines_from_file
 
 
-def run_SWMM(inp_path, rainfall_dats_directory):
+def run_SWMM(inp_path, rainfall_dats_directory, simulations_path):
   list_of_rain_datfiles = os.listdir(rainfall_dats_directory)
-
 
   for event in list_of_rain_datfiles:
       rain_event_path = rainfall_dats_directory + '\\' + event
@@ -256,10 +247,20 @@ def run_SWMM(inp_path, rainfall_dats_directory):
           for line in dat:
               fh.write("%s" % line)
 
+def extract_and_pickle_SWMM_results(simulations_path):
+  list_of_simulations = os.listdir(simulations_path)
+  for sim in list_of_simulations:
+      c_simulation_folder_path = '\\'.join([simulations_path, sim])
+      working_out ='\\'.join([c_simulation_folder_path, 'model.out'])
 
+      head_out_timeseries  = swm.extract(working_out, 'node,,Hydraulic_head')
+      runoff_timeseries  = swm.extract(working_out, 'subcatchment,,Runoff_rate')
 
+      with open(c_simulation_folder_path+'\\hydraulic_head.pk', 'wb') as handle:
+          pickle.dump(head_out_timeseries, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-
+      with open(c_simulation_folder_path+'\\runoff.pk', 'wb') as handle:
+          pickle.dump(runoff_timeseries, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 
@@ -273,10 +274,6 @@ def hietograph(rain, title):
 
   rain_values = [float(i) for i in rain.values()]
 
-  # df = pd.DataFrame(dict(
-  #     date=rain_times,
-  #     value=rain_values
-  # ))
   bar = go.Bar(x=rain_times, y = rain_values) #px.bar(df, x='date', y="value")
 
 
@@ -290,7 +287,9 @@ def hietograph(rain, title):
       font=dict(
           family="Times new roman",
           size=18,
-      )
+      ),
+      width=800, 
+      height=400
   )
 
 
@@ -314,5 +313,3 @@ def extract_info_inp(lines, line_where, header, names = [], elevation =[]):
     return names, elevation
 
 
-
-# Classes ------------------------------------------------------------------------------------------------------

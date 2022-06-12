@@ -20,7 +20,7 @@ Heun or Runge-Kutta approach.
 
 Metrics of performance.
 
-
+Hyperoptimization of the Neural Network
 
 
 
@@ -29,3 +29,6 @@ Annotations:
 The time for running the simulations in SWMM (1 block rainfall, 10 synthetic cases, 10 real cases with intensity bigger than 10) was 5 minutes, 19 seconds
 
 I removed the DWF information from the inp file.
+
+There are two ways that the information can be used. One is for training the program (generating the sample objects)
+The other is by passing an event (runoff) and an initial depth to see how it solves it.

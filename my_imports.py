@@ -15,6 +15,7 @@ import torch.optim as optim
 
 ## Custom modules
 import utils.DynamicEmulator as DE
+from utils.SWMM_Simulation import SWMMEventSimulation
 import utils.head_change_utils as utils
 from models.mlp_q_interchange import QInterchangeNN, QRunoffNN
 from models.mlp_q_interchange import count_parameters

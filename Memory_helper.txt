@@ -9,12 +9,12 @@ Runoff instead of rainfall
 Performance metrics. Calculate the error of the time series as Elvin in Bishwadeep's presentation.
 Statistics:    Number of parameters. Number of training examples.
 
-Check Saint-Vennant equations.
-
 Consider the invert offsets.
 
 Consider two different networks depending on the pipe section.
 (One for the EGG and other for the CIRCLE)
+
+Check Saint-Vennant equations.
 
 Heun or Runge-Kutta approach.
 
@@ -36,3 +36,11 @@ The other is by passing an event (runoff) and an initial depth to see how it sol
 
 2022-06-12 09:59:42
 I improved the database code: Moved the extract heads and runoff method to the utils part.
+
+2022-06-13 07:03:51
+Remember to include the nodal area (also for the future storage tanks)
+
+2022-06-13 08:44:31
+Debe simlar la profundidad en todos los nodos. Especialmente en los outfalls. Cómo sé cuánto caudal pasa?
+La condición de frontera es cero, así que debe ser función del valor que se está rechazando, el que se está volviendo cero.
+

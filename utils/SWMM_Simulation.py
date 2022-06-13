@@ -1,4 +1,4 @@
-class SWMMEventSimulation:
+class SWMMSimulation:
     def __init__(self, rainfall_raw_data, heads_raw_data, runoff_raw_data):
         self.rainfall_raw_data = rainfall_raw_data
         self.heads_raw_data = heads_raw_data

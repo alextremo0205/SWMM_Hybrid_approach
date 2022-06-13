@@ -41,6 +41,8 @@ I improved the database code: Moved the extract heads and runoff method to the u
 Remember to include the nodal area (also for the future storage tanks)
 
 2022-06-13 08:44:31
-Debe simlar la profundidad en todos los nodos. Especialmente en los outfalls. Cómo sé cuánto caudal pasa?
+Debe simular la profundidad en todos los nodos. Especialmente en los outfalls. Cómo sé cuánto caudal pasa?
 La condición de frontera es cero, así que debe ser función del valor que se está rechazando, el que se está volviendo cero.
 
+2022-06-13 15:19:31
+Hay un problema con las diferencias de nivel, su magnitud es mayor a uno, no es bueno para entrenar las redes neuronales.

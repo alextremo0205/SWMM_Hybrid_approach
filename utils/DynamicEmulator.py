@@ -12,10 +12,10 @@ def dict_to_torch(d):
     return dict_torch
 
 
-w_in =      to_torch(0.65)
-w_out =     to_torch(0.65)
-constant =  to_torch(0.005)
-constant = torch.reshape(constant, (1, 1))
+# w_in =      to_torch(0.65)
+# w_out =     to_torch(0.65)
+# constant =  to_torch(0.005)
+# constant = torch.reshape(constant, (1, 1))
 
 nodes_outfalls = ['j_90552', 'j_90431']
 
@@ -74,7 +74,7 @@ class DynamicEmulator:
 
 
 
-    def update_h(self, rain):#, time, prev_state_pump):
+    def update_h(self, runoff):#, time, prev_state_pump):
         
         new_h0= {}
         new_h0_2= {}
@@ -85,7 +85,8 @@ class DynamicEmulator:
             
             hi_min = self.original_min[node]
             
-            total_dh = 0
+            total_dh_transfer = 0
+            
             for _, neigh in self.G.edges(node):      #Updates for each of the neighbors
                 hj = self.h[neigh]
                 hj_min = self.original_min[neigh]
@@ -98,12 +99,14 @@ class DynamicEmulator:
                 else:                                                   #In case there is valid gradient, this function calculates the change in head
                     q_transfer = self.calculate_dh_transfer(hj, hi, link)
                 
-                if rain==0:
-                    q_rain = torch.zeros(1, 1)
-                else:
-                    q_rain = self.calculate_dh_runoff(rain)    
+                total_dh_transfer += q_transfer
                 
-                total_dh += q_transfer + q_rain #(q_transfer + q_rain(rain[time], original_A_catch[node], weight_rain) + q_dwf(original_basevalue_dwf[node], dwf_hourly[time%24], weight_dwf))*dt 
+            if runoff[node]==0:
+                q_runoff = torch.zeros(1, 1)
+            else:
+                q_runoff = self.calculate_dh_runoff(runoff[node])    
+                
+            total_dh = total_dh_transfer + q_runoff #(q_transfer + q_rain(rain[time], original_A_catch[node], weight_rain) + q_dwf(original_basevalue_dwf[node], dwf_hourly[time%24], weight_dwf))*dt 
             
             hi_min = torch.reshape(hi_min, (1, 1))
             new_h0[node] = max(hi+total_dh, hi_min) #The new head cannot be under the minimimum level. Careful!! A node may be giving more than it has to offer.
@@ -167,6 +170,7 @@ class DynamicEmulator:
         """
         dif = hj-hi
         
+        
         length = to_torch(link["normalized_length"])
         diameter= to_torch(link["normalized_geom_1"])
         
@@ -174,17 +178,20 @@ class DynamicEmulator:
         length =    torch.reshape(length, (1, 1))
         diameter =  torch.reshape(diameter, (1, 1))
 
-        
+
+
+        if abs(dif)>1:
+            print(dif)
         x = torch.cat([dif, length, diameter], dim=1) 
         
         ans = self.q_transfer_ANN(x)
         
         return ans
 
-    def calculate_dh_runoff(self,rain):
-        rain = to_torch(rain)
-        rain = torch.reshape(rain, (1, 1))
-        ans = self.q_runoff_ANN(rain)
+    def calculate_dh_runoff(self,runoff):
+        runoff = to_torch(runoff)
+        runoff = torch.reshape(runoff, (1, 1))
+        ans = self.q_runoff_ANN(runoff)
         
         return ans
         
@@ -203,28 +210,28 @@ def is_giver_manhole_dry(hi, hi_min, hj, hj_min):
 #Governing functions
 #-----------------------------------------------------------------
 
-def q_interchange_in(dh, L, d):
-    """
-    This function evaluates the magnitude that the difference in head has in the next head. How water flows.
-    """
+# def q_interchange_in(dh, L, d):
+#     """
+#     This function evaluates the magnitude that the difference in head has in the next head. How water flows.
+#     """
 
-    num = (d**(5/2))*(dh**0.5) #**2.0)
-    den = L**0.5
-    q = w_in*(num/den)
+#     num = (d**(5/2))*(dh**0.5) #**2.0)
+#     den = L**0.5
+#     q = w_in*(num/den)
     
-    return q
+#     return q
 
 
-def q_interchange_out(dh, L, d):
-    """
-    This function evaluates the magnitude that the difference in head has in the next head. How water flows.
-    """
+# def q_interchange_out(dh, L, d):
+#     """
+#     This function evaluates the magnitude that the difference in head has in the next head. How water flows.
+#     """
 
-    num = (d**(5/2))*(dh**0.5) #**2.0)
-    den = L**0.5
-    q = w_out*(num/den)
+#     num = (d**(5/2))*(dh**0.5) #**2.0)
+#     den = L**0.5
+#     q = w_out*(num/den)
     
-    return -q
+#     return -q
 
 
 def q_rain(i, A_catch, w):

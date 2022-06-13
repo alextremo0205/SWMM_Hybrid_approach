@@ -1,9 +1,11 @@
 import unittest
 
+import networkx as nx
 import sys
 from os import path as path_lib
 
 sys.path.insert(0, '')
+
 
 #Import custom libraries after this line
 from my_imports import *
@@ -41,8 +43,31 @@ class YAMLTest(unittest.TestCase):
 
 
 
+class SWMMEmulatorTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        yaml_path = 'config_file.yaml'
+        cls.yaml_data = utils.load_yaml(yaml_path)
+        
+        inp_path =  cls.yaml_data['inp_path']
+        cls.swmmEmulator = SWMMEmulator(inp_path)
 
-class HydraulicSimulationTest(unittest.TestCase):
+    def test_inp(self):
+        inp_lines = self.__class__.swmmEmulator.inp_lines
+        G = self.__class__.swmmEmulator.G
+        self.assertIsInstance(inp_lines, list)
+        self.assertIsInstance(G, nx.Graph)
+
+    def test_to_torch(self):
+        trial_value = to_torch('0.1')
+        self.assertIsInstance(trial_value,torch.Tensor)
+        self.assertIsInstance(trial_value.item(), float)
+        
+
+
+
+
+class SWMMSimulationTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         yaml_path = 'config_file.yaml'
@@ -68,28 +93,33 @@ class HydraulicSimulationTest(unittest.TestCase):
         runoff_raw_data =   utils.get_runoff_from_pickle(runoff_path)
     
     
-        cls.swmmObject = SWMMEventSimulation(rainfall_raw_data,
+        cls.swmmSimulation = SWMMSimulation(rainfall_raw_data,
                                             heads_raw_data,
                                             runoff_raw_data)
 
     @classmethod
     def tearDownClass(cls):
         del cls.yaml_data
-        del cls.swmmObject
+        del cls.swmmSimulation
 
 
     def test_create_hydraulic_simulation(self):
-        self.assertTrue(self.swmmObject != None)
+        self.assertTrue(self.swmmSimulation != None)
 
     def test_read_attributes(self):
-        rain =   self.__class__.swmmObject.rainfall_raw_data
-        heads =  self.__class__.swmmObject.heads_raw_data
-        runoff = self.__class__.swmmObject.runoff_raw_data
-
+        rain =   self.__class__.swmmSimulation.rainfall_raw_data
+        heads =  self.__class__.swmmSimulation.heads_raw_data
+        runoff = self.__class__.swmmSimulation.runoff_raw_data
+        
         attributes =[rain, heads, runoff]
 
         for a in attributes:
             self.assertIsInstance(a, pd.DataFrame)
+    
+    def test_network_layout(self):
+        pass
+        
+        
         
 
 if __name__ == '__main__':

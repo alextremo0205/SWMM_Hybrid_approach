@@ -62,22 +62,27 @@ def get_dry_periods_index(rainfall_raw_data):
     return dry_periods_index
 
 
-def get_x0_ht_couples(rainfall_raw_data, heads_timeseries, steps_ahead):
+def get_x0_ht_couples(rainfall_raw_data, heads_timeseries, runoff_timeseries, steps_ahead):
     couples =[]
     for i in range(len(heads_timeseries)-steps_ahead):
 
         h0_samples = heads_timeseries.iloc[i,:].to_dict()
         
         rt_samples = [rainfall_raw_data.iloc[i].value]     
+        ro_samples = [runoff_timeseries.iloc[i].to_dict()]
         ht_samples = []
+        
         for j in range(steps_ahead):    
             ht = heads_timeseries.iloc[i+j+1,:].to_dict()
             ht_samples.append(ht)
             
             rt = rainfall_raw_data.iloc[i+j+1].value
             rt_samples.append(rt)
+            
+            ro = runoff_timeseries.iloc[i+j+1].to_dict()
+            ro_samples.append(ro)
 
-        x0_samples = [rt_samples, h0_samples]
+        x0_samples = [rt_samples, h0_samples, ro_samples]
 
         couple=(x0_samples, ht_samples)
         couples.append(couple)

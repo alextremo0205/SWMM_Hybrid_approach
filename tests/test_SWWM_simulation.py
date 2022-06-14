@@ -40,37 +40,6 @@ class YAMLTest(unittest.TestCase):
         self.assertTrue(path_lib.exists(c_path))
 
 
-# class SWMMSimulationTest(unittest.TestCase):
-#     @classmethod
-#     def setUpClass(cls):
-#         yaml_path = 'config_file.yaml'
-#         cls.yaml_data = utils.load_yaml(yaml_path)
-        
-#         inp_path =  cls.yaml_data['inp_path']
-#         inp_lines = utils.get_lines_from_textfile(inp_path)
-#         cls.G = utils.inp_to_G(inp_lines)
-
-#     def test_inp_lines_is_a_list(self):
-#         inp_lines = self.__class__.inp_lines
-#         self.assertIsInstance(inp_lines, list)
-#         self.assertIsInstance(inp_lines[0], str)
-        
-#     def test_G_is_a_networkx_graph(self):
-#         G = self.__class__.G
-#         self.assertIsInstance(G, nx.Graph)
-
-#     # def test_to_torch_function(self):
-#     #     trial_value = to_torch('0.1')
-#     #     self.assertIsInstance(trial_value,torch.Tensor)
-#     #     self.assertIsInstance(trial_value.item(), float)
-        
-#     def test_create_simulation(self):
-#         simulation = SWMMSimulation(rainfall_raw_data=pd.DataFrame(), 
-#                                     heads_raw_data=pd.DataFrame(), 
-#                                     runoff_raw_data=pd.DataFrame())
-#         self.assertIsInstance(simulation, SWMMSimulation)
-
-
 class SWMMSimulationTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

@@ -12,17 +12,13 @@ def dict_to_torch(d):
     return dict_torch
 
 
-# w_in =      to_torch(0.65)
-# w_out =     to_torch(0.65)
-# constant =  to_torch(0.005)
-# constant = torch.reshape(constant, (1, 1))
 
 nodes_outfalls = ['j_90552', 'j_90431']
 
 class DynamicEmulator:
     
     def __init__(self, inp_path, q_transfer_ANN, q_runoff_ANN):
-        # assert type(initial_h0) == dict, "Depths should be a dictionary"
+        
 
         self.inp_lines = utils.get_lines_from_textfile(inp_path)
         self.G = utils.inp_to_G(self.inp_lines)
@@ -115,42 +111,6 @@ class DynamicEmulator:
             min_outfall=self.original_min[node_outfalls]
             new_h0[node_outfalls] = torch.reshape(min_outfall, (1,1))
 
-        # for node, hi in new_h0.items():         #links connected to that node
-            
-        #     hi_min = self.original_min[node]
-            
-        #     total_dh = 0
-        #     for _, neigh in self.G.edges(node):      #Updates for each of the neighbors
-        #         hj = new_h0[neigh]
-        #         hj_min = self.original_min[neigh]
-                
-        #         #Extract edge attributes
-        #         link = self.G.edges[node, neigh]
-
-        #         if is_giver_manhole_dry(hi, hi_min, hj, hj_min):     #if the heads are in their minimum, they cannot give water
-        #             q_transfer = torch.zeros(1, 1)
-        #         else:                                                   #In case there is valid gradient, this function calculates the change in head
-        #             q_transfer = self.calculate_dh_transfer(hj, hi, link)
-                
-        #         if rain==0:
-        #             q_rain = torch.zeros(1, 1)
-        #         else:
-        #             q_rain = self.calculate_dh_runoff(rain)    
-                
-        #         total_dh += q_transfer + q_rain #(q_transfer + q_rain(rain[time], original_A_catch[node], weight_rain) + q_dwf(original_basevalue_dwf[node], dwf_hourly[time%24], weight_dwf))*dt 
-            
-        #     hi_min = torch.reshape(hi_min, (1, 1))
-        #     new_h0_2[node] = max(hi+total_dh, hi_min) #The new head cannot be under the minimimum level. Careful!! A node may be giving more than it has to offer.
-
-        # for node_outfalls in outfalls:
-        #     min_outfall=self.original_min[node_outfalls]
-        #     new_h0_2[node_outfalls] = torch.reshape(min_outfall, (1,1))
-
-
-        # final_h0 = {}
-        # for k,v in new_h0_2.items():
-        #     final_h0[k] = (new_h0[k]+new_h0_2[k])/2
-
         self.h = new_h0
 
     def draw_nx_layout(self):
@@ -209,30 +169,6 @@ def is_giver_manhole_dry(hi, hi_min, hj, hj_min):
 #-----------------------------------------------------------------
 #Governing functions
 #-----------------------------------------------------------------
-
-# def q_interchange_in(dh, L, d):
-#     """
-#     This function evaluates the magnitude that the difference in head has in the next head. How water flows.
-#     """
-
-#     num = (d**(5/2))*(dh**0.5) #**2.0)
-#     den = L**0.5
-#     q = w_in*(num/den)
-    
-#     return q
-
-
-# def q_interchange_out(dh, L, d):
-#     """
-#     This function evaluates the magnitude that the difference in head has in the next head. How water flows.
-#     """
-
-#     num = (d**(5/2))*(dh**0.5) #**2.0)
-#     den = L**0.5
-#     q = w_out*(num/den)
-    
-#     return -q
-
 
 def q_rain(i, A_catch, w):
     

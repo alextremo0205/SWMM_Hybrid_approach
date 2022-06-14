@@ -22,13 +22,11 @@ class YAMLTest(unittest.TestCase):
     def tearDownClass(cls):
         del cls.yaml_data
         
-
-
+        
     def test_valid_dictionary(self):
         yaml_data = self.__class__.yaml_data
         self.assertIsInstance(yaml_data, dict)
         
-    
     def test_paths_validity(self):
         yaml_data = self.__class__.yaml_data
         directory_paths = [path for name, path in yaml_data.items() if 'path' in name]
@@ -42,29 +40,35 @@ class YAMLTest(unittest.TestCase):
         self.assertTrue(path_lib.exists(c_path))
 
 
-
-class SWMMEmulatorTest(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        yaml_path = 'config_file.yaml'
-        cls.yaml_data = utils.load_yaml(yaml_path)
+# class SWMMSimulationTest(unittest.TestCase):
+#     @classmethod
+#     def setUpClass(cls):
+#         yaml_path = 'config_file.yaml'
+#         cls.yaml_data = utils.load_yaml(yaml_path)
         
-        inp_path =  cls.yaml_data['inp_path']
-        cls.swmmEmulator = SWMMEmulator(inp_path)
+#         inp_path =  cls.yaml_data['inp_path']
+#         inp_lines = utils.get_lines_from_textfile(inp_path)
+#         cls.G = utils.inp_to_G(inp_lines)
 
-    def test_inp(self):
-        inp_lines = self.__class__.swmmEmulator.inp_lines
-        G = self.__class__.swmmEmulator.G
-        self.assertIsInstance(inp_lines, list)
-        self.assertIsInstance(G, nx.Graph)
-
-    def test_to_torch(self):
-        trial_value = to_torch('0.1')
-        self.assertIsInstance(trial_value,torch.Tensor)
-        self.assertIsInstance(trial_value.item(), float)
+#     def test_inp_lines_is_a_list(self):
+#         inp_lines = self.__class__.inp_lines
+#         self.assertIsInstance(inp_lines, list)
+#         self.assertIsInstance(inp_lines[0], str)
         
+#     def test_G_is_a_networkx_graph(self):
+#         G = self.__class__.G
+#         self.assertIsInstance(G, nx.Graph)
 
-
+#     # def test_to_torch_function(self):
+#     #     trial_value = to_torch('0.1')
+#     #     self.assertIsInstance(trial_value,torch.Tensor)
+#     #     self.assertIsInstance(trial_value.item(), float)
+        
+#     def test_create_simulation(self):
+#         simulation = SWMMSimulation(rainfall_raw_data=pd.DataFrame(), 
+#                                     heads_raw_data=pd.DataFrame(), 
+#                                     runoff_raw_data=pd.DataFrame())
+#         self.assertIsInstance(simulation, SWMMSimulation)
 
 
 class SWMMSimulationTest(unittest.TestCase):
@@ -72,30 +76,29 @@ class SWMMSimulationTest(unittest.TestCase):
     def setUpClass(cls):
         yaml_path = 'config_file.yaml'
         cls.yaml_data = utils.load_yaml(yaml_path)
+        
+        inp_path = cls.yaml_data['inp_path']
         simulations_path = cls.yaml_data['simulations_path']
+        
 
         list_of_simulations = os.listdir(simulations_path)
 
+        inp_lines = utils.get_lines_from_textfile(inp_path)
+        G = utils.inp_to_G(inp_lines)
+
         for sim in list_of_simulations:
-            rain_path = '\\'.join([simulations_path,sim,sim+'.dat'])
             hydraulic_heads_path = '\\'.join([simulations_path,sim,'hydraulic_head.pk'])
             runoff_path = '\\'.join([simulations_path,sim,'runoff.pk'])
+            
+            heads_raw_data = utils.get_heads_from_pickle(hydraulic_heads_path)
+            runoff_raw_data = utils.get_runoff_from_pickle(runoff_path)
+            
+            sim = SWMMSimulation(G, heads_raw_data, runoff_raw_data)
+            
             break
-
-
-        # #Rainfall
-        rainfall_raw_data = utils.get_rain_in_pandas(rain_path)
-
-        # #Hydraulic head
-        heads_raw_data =    utils.get_heads_from_pickle(hydraulic_heads_path)
-
-        # #Runoff
-        runoff_raw_data =   utils.get_runoff_from_pickle(runoff_path)
     
     
-        cls.swmmSimulation = SWMMSimulation(rainfall_raw_data,
-                                            heads_raw_data,
-                                            runoff_raw_data)
+        cls.swmmSimulation = sim
 
     @classmethod
     def tearDownClass(cls):
@@ -106,12 +109,11 @@ class SWMMSimulationTest(unittest.TestCase):
     def test_create_hydraulic_simulation(self):
         self.assertTrue(self.swmmSimulation != None)
 
-    def test_read_attributes(self):
-        rain =   self.__class__.swmmSimulation.rainfall_raw_data
+    def test_attributes_are_pd_dataframes(self):
         heads =  self.__class__.swmmSimulation.heads_raw_data
         runoff = self.__class__.swmmSimulation.runoff_raw_data
         
-        attributes =[rain, heads, runoff]
+        attributes =[heads, runoff]
 
         for a in attributes:
             self.assertIsInstance(a, pd.DataFrame)

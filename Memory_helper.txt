@@ -46,3 +46,7 @@ La condición de frontera es cero, así que debe ser función del valor que se e
 
 2022-06-13 15:19:31
 Hay un problema con las diferencias de nivel, su magnitud es mayor a uno, no es bueno para entrenar las redes neuronales.
+
+2022-06-14 10:10:23
+Pass the diameter multiple times to the ANN that calculates dh due to gradient.
+

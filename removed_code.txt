@@ -1,6 +1,47 @@
 
 
 
+
+
+
+
+
+
+
+
+
+self.node_names = nx.get_node_attributes(self.G, 'nodes_names')
+
+
+
+
+
+
+ # for i in range(len(heads)-steps_ahead):
+
+        #     h0_samples = heads.iloc[i,:].to_dict()
+            
+        #     ro_samples = [runoff.iloc[i].to_dict()]
+        #     ht_samples = []
+            
+        #     for j in range(steps_ahead):    
+        #         ht = heads.iloc[i+j+1,:].to_dict()
+        #         ht_samples.append(ht)
+                                
+        #         ro = runoff.iloc[i+j+1].to_dict()
+        #         ro_samples.append(ro)
+
+        #     x0_samples = [h0_samples, ro_samples]
+
+        #     couple=(x0_samples, ht_samples)
+        #     couples.append(couple)
+
+        # return couples
+
+
+
+
+
 #SWMMEmulator----------------------------------------------------------------
 # import torch
 # import networkx as nx

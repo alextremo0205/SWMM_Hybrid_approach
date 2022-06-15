@@ -9,7 +9,6 @@ sys.path.insert(0, '')
 #Import custom libraries after this line
 from my_imports import *
 
-
 class SWMMSimulationTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -61,22 +60,18 @@ class SWMMSimulationTest(unittest.TestCase):
         self.assertIsInstance(G, nx.Graph)
         
     def test_window_is_PyG(self):
-        window = self.sim.get_window(steps_ahead=1)
+        window = self.sim.get_window(steps_ahead=1, time =0)
         self.assertIsInstance(window, Data)
         
     def test_window_x_isNxF(self):
-        print(self.sim.heads_raw_data)
-        
         steps_ahead=1
-        window = self.sim.get_window(steps_ahead)
+        window = self.sim.get_window(steps_ahead, time = 0)
         num_nodes = window.num_nodes
         num_x_features = window.num_node_features
         x = window.x
         
         
-        self.assertTrue(x.shape(), (num_nodes, num_x_features))
+        self.assertTrue(x.shape, (num_nodes, num_x_features))
     
-
-
 if __name__ == '__main__':
     unittest.main()

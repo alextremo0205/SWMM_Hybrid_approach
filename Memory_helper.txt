@@ -50,3 +50,6 @@ Hay un problema con las diferencias de nivel, su magnitud es mayor a uno, no es 
 2022-06-14 10:10:23
 Pass the diameter multiple times to the ANN that calculates dh due to gradient.
 
+
+2022-06-15 10:10:59
+Include the manhole area as node attribute.

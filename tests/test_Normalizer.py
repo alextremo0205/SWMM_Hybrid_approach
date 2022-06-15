@@ -48,7 +48,31 @@ class NormalizerTest(unittest.TestCase):
     def test_max_head_is_greater_than_min_head(self):
         min_h = self.normalizer.min_h
         max_h = self.normalizer.max_h
-        self.assertGreaterEqual(max_h, min_h)
+        self.assertGreater(max_h, min_h)
+
+    def test_global_min(self):
+        min_h = self.normalizer.min_h
+        for window in self.normalizer.training_windows:
+            self.assertLessEqual(min_h, window.x[:, 0].min())
+
+
+    def test_global_max(self):
+        max_h = self.normalizer.max_h
+        for window in self.normalizer.training_windows:
+            self.assertGreaterEqual(max_h, window.x[:, 0].max())
+
+
+    def test_min_length(self):
+        min_length = self.normalizer.min_length
+        for window in self.normalizer.training_windows:
+            self.assertLessEqual(min_length, window.length.min())
+    
+    def test_max_length(self):
+        max_length = self.normalizer.max_length
+        for window in self.normalizer.training_windows:
+            self.assertGreaterEqual(max_length, window.length.max())
+        
+
 
 if __name__ == '__main__':
     unittest.main()

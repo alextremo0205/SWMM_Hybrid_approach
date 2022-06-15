@@ -253,11 +253,11 @@ def get_conduits_from_inp_lines(lines, inp_dict):
             l_split = line.split()
             source_node, destiny_node = l_split[1], l_split[2]
 
-            edge_attributes['name_conduits'] = l_split[0]
-            edge_attributes['length'] = l_split[3]
-            edge_attributes['roughness'] = l_split[4]
-            edge_attributes['in_offset'] = l_split[5]
-            edge_attributes['out_offset'] = l_split[6]
+            edge_attributes['name_conduits']= l_split[0]
+            edge_attributes['length']       = float(l_split[3])
+            edge_attributes['roughness']    = float(l_split[4])
+            edge_attributes['in_offset']    = float(l_split[5])
+            edge_attributes['out_offset']   = float(l_split[6])
 
             
             conduits[(source_node, destiny_node)] = edge_attributes

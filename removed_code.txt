@@ -1,4 +1,53 @@
+# def normalize_min_max(value, max,min):
+#     return (value - min)/(max-min)
 
+
+
+# class Normalizer:
+#     def __init__(self, X_train, y_train):
+#         self.initial_heads = [i[1] for i in X_train]
+#         self.y_train = y_train
+#         self.max_h, self.min_h = self.get_max_and_min_h()
+#         self.normalized_h0_in_x = self.normalize_x_heads()
+#         self.normalized_ht_in_y = self.normalize_y_heads()
+
+#     def get_max_and_min_h(self):
+#         samples_final = []
+#         samples_final.extend(self.initial_heads)
+        
+#         for i in self.y_train:
+#             samples_final+=i
+        
+#         max = np.array(list(samples_final[0].values())).max()
+#         min = np.array(list(samples_final[0].values())).min()
+
+#         for sample in samples_final:
+#             val_max = np.array(list(sample.values())).max()
+#             val_min = np.array(list(sample.values())).min()
+#             if val_max>max:
+#                 max = val_max
+#             if val_min<min:
+#                 min = val_min
+
+#         return max, min
+
+#     def normalize_x_heads(self):       
+#         normalized_samples = []
+#         for sample in self.initial_heads:
+#             normalized_sample = dict(map(lambda x: (x[0], normalize_min_max(x[1], self.max_h, self.min_h )), sample.items()))
+#             normalized_samples.append(normalized_sample)
+#         return normalized_samples
+
+
+#     def normalize_y_heads(self):
+#         normalized_list = []
+#         for heads_in_step in self.y_train:
+#             normalized_samples = []
+#             for sample in heads_in_step:
+#                 normalized_sample = dict(map(lambda x: (x[0], normalize_min_max(x[1], self.max_h, self.min_h )), sample.items()))
+#                 normalized_samples.append(normalized_sample)
+#             normalized_list.append(normalized_samples)
+#         return normalized_list
 
 
 

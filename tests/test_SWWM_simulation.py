@@ -1,12 +1,10 @@
 import unittest
 import networkx as nx
-
 from torch_geometric.data import Data
+
+
 import sys
 sys.path.insert(0, '')
-
-
-#Import custom libraries after this line
 from my_imports import *
 
 class SWMMSimulationTest(unittest.TestCase):
@@ -18,28 +16,8 @@ class SWMMSimulationTest(unittest.TestCase):
         inp_path = cls.yaml_data['inp_path']
         simulations_path = cls.yaml_data['simulations_path']
         
-        list_of_simulations = os.listdir(simulations_path)
+        simulations = utils.extract_simulations_from_folders(simulations_path, inp_path, max_events = 5)
 
-        inp_lines = utils.get_lines_from_textfile(inp_path)
-        G = utils.inp_to_G(inp_lines)
-
-        simulations =[]
-        max_events = 5
-        num_saved_events = 0
-        for simulation in list_of_simulations:
-            hydraulic_heads_path = '\\'.join([simulations_path,simulation,'hydraulic_head.pk'])
-            runoff_path = '\\'.join([simulations_path,simulation,'runoff.pk'])
-            
-            heads_raw_data = utils.get_heads_from_pickle(hydraulic_heads_path)
-            runoff_raw_data = utils.get_runoff_from_pickle(runoff_path)
-            
-            sim = SWMMSimulation(G, heads_raw_data, runoff_raw_data)
-            simulations.append(sim)
-            if num_saved_events>=max_events:
-                break
-            
-            num_saved_events+= 1
-            
         event_to_test= 2
         cls.sim = simulations[event_to_test]
 
@@ -51,7 +29,7 @@ class SWMMSimulationTest(unittest.TestCase):
     #Unit tests----------------------------------------------------------------
 
     def test_swmmSimulation_exists(self):
-        self.assertTrue(self.sim != None)
+        self.assertIsInstance(self.sim, SWMMSimulation)
 
     def test_attributes_are_pd_dataframes(self):
         heads =  self.sim.heads_raw_data

@@ -1,3 +1,4 @@
+import os
 import yaml
 from yaml.loader import SafeLoader
 
@@ -5,8 +6,11 @@ import pickle
 import numpy as np
 import pandas as pd
 import networkx as nx
-import plotly.graph_objects as go
 import plotly.express as px
+import plotly.graph_objects as go
+
+
+from utils.SWMM_Simulation import SWMMSimulation
 
 def load_yaml(yaml_path):
     with open(yaml_path) as f:
@@ -75,64 +79,33 @@ def get_rolled_out_target_hydraulic_heads(heads_timeseries):
     return rolled_out_target_hydraulic_heads
 
 
-
-
-# def normalize_min_max(value, max,min):
-#     return (value - min)/(max-min)
-
-
-
-# class Normalizer:
-#     def __init__(self, X_train, y_train):
-#         self.initial_heads = [i[1] for i in X_train]
-#         self.y_train = y_train
-#         self.max_h, self.min_h = self.get_max_and_min_h()
-#         self.normalized_h0_in_x = self.normalize_x_heads()
-#         self.normalized_ht_in_y = self.normalize_y_heads()
-
-#     def get_max_and_min_h(self):
-#         samples_final = []
-#         samples_final.extend(self.initial_heads)
+def extract_simulations_from_folders(simulations_path, inp_path, max_events=-1):
+    
+    list_of_simulations = os.listdir(simulations_path)
+    
+    if max_events == -1:
+        max_events = len(list_of_simulations)
+    
+    inp_lines = get_lines_from_textfile(inp_path)
+    G = inp_to_G(inp_lines)
+    simulations =[]
+    
+    num_saved_events = 0
+    for simulation in list_of_simulations:
+        hydraulic_heads_path = '\\'.join([simulations_path,simulation,'hydraulic_head.pk'])
+        runoff_path = '\\'.join([simulations_path,simulation,'runoff.pk'])
         
-#         for i in self.y_train:
-#             samples_final+=i
+        heads_raw_data = get_heads_from_pickle(hydraulic_heads_path)
+        runoff_raw_data = get_runoff_from_pickle(runoff_path)
         
-#         max = np.array(list(samples_final[0].values())).max()
-#         min = np.array(list(samples_final[0].values())).min()
-
-#         for sample in samples_final:
-#             val_max = np.array(list(sample.values())).max()
-#             val_min = np.array(list(sample.values())).min()
-#             if val_max>max:
-#                 max = val_max
-#             if val_min<min:
-#                 min = val_min
-
-#         return max, min
-
-#     def normalize_x_heads(self):       
-#         normalized_samples = []
-#         for sample in self.initial_heads:
-#             normalized_sample = dict(map(lambda x: (x[0], normalize_min_max(x[1], self.max_h, self.min_h )), sample.items()))
-#             normalized_samples.append(normalized_sample)
-#         return normalized_samples
-
-
-#     def normalize_y_heads(self):
-#         normalized_list = []
-#         for heads_in_step in self.y_train:
-#             normalized_samples = []
-#             for sample in heads_in_step:
-#                 normalized_sample = dict(map(lambda x: (x[0], normalize_min_max(x[1], self.max_h, self.min_h )), sample.items()))
-#                 normalized_samples.append(normalized_sample)
-#             normalized_list.append(normalized_samples)
-#         return normalized_list
-
-
-
-
-
-
+        sim = SWMMSimulation(G, heads_raw_data, runoff_raw_data)
+        simulations.append(sim)
+        
+        if num_saved_events>=max_events:
+            break
+        
+        num_saved_events+= 1
+    return simulations
 
 def inp_to_G(lines):
     #Reading the headers of the inp file
@@ -143,7 +116,6 @@ def inp_to_G(lines):
 
     #Extracting the node coordinates from the inp file and saving them in the nx graph
     # Nodes ---------------------------------------------------------------------------------------------
-    # points = []
     nodes_coordinates = get_nodes_coordinates(lines, inp_dict)
     nodes_elevation = get_nodes_elevation(lines, inp_dict)
 
@@ -176,8 +148,6 @@ def inp_to_G(lines):
     try:
         end = inp_dict['[PUMPS]\n']-1
     
-        # with open(working_inp) as f:
-        #     lines = f.readlines()
         for i in range(inp_dict['[PUMPS]\n']+3, inp_dict['[ORIFICES]\n']-1):
             # print(lines[i].split())
             pump = lines[i].split()[:-4]
@@ -185,7 +155,7 @@ def inp_to_G(lines):
             pumps.append(lines[i])
     
     except Exception as e:
-        print("The file does not have pumps. A handled exception occured because of "+str(e))
+        print("The file does not have "+str(e))
 
     #Orifices----------------------------------------------------------------------------
     orifices = []
@@ -193,16 +163,13 @@ def inp_to_G(lines):
     try:
         end = inp_dict['[ORIFICES]\n']-1
         
-        # with open(working_inp) as f:
-        #     lines = f.readlines()
         for i in range(inp_dict['[ORIFICES]\n']+3+1, inp_dict['[WEIRS]\n']-1):
-            # print(lines[i].split())
             orifice = lines[i].split()[:-4]
             G.add_edge(orifice[1],orifice[2])
             orifices.append(lines[i])
     
     except Exception as e:
-        print("The file does not have orifices. A handled exception occured because of "+str(e))
+        print("The file does not have "+str(e))
 
 
     #Weirs----------------------------------------------------------------------------
@@ -220,7 +187,7 @@ def inp_to_G(lines):
             weirs.append(lines[i])
         
     except Exception as e:
-        print("The file does not have weirs. A handled exception occured because of "+str(e))
+        print("The file does not have "+str(e))
     
     
     return(G)
@@ -253,7 +220,7 @@ def get_nodes_elevation(lines, inp_dict):
             elevations = get_elevation_from_type(type_of_node, lines, inp_dict)
             nodes_elevation.update(elevations)
         except Exception as e:
-            print('There are no '+type_of_node+' in the file')
+            print('The file does not have '+type_of_node)
     return nodes_elevation
 
 

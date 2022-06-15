@@ -1,0 +1,25 @@
+import unittest
+
+import sys
+sys.path.insert(0, '')
+
+from my_imports import *
+
+class NormalizerTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        pass
+        
+    @classmethod
+    def tearDownClass(cls):
+        pass
+        
+        
+    #Unit tests ----------------------------------------------------------------
+    def test_empty(self):
+        self.assertEqual(0,0)
+        
+        
+        
+if __name__ == '__main__':
+    unittest.main()

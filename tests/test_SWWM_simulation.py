@@ -23,6 +23,9 @@ class SWMMSimulationTest(unittest.TestCase):
         inp_lines = utils.get_lines_from_textfile(inp_path)
         G = utils.inp_to_G(inp_lines)
 
+        simulations =[]
+        max_events = 5
+        num_saved_events = 0
         for simulation in list_of_simulations:
             hydraulic_heads_path = '\\'.join([simulations_path,simulation,'hydraulic_head.pk'])
             runoff_path = '\\'.join([simulations_path,simulation,'runoff.pk'])
@@ -31,11 +34,14 @@ class SWMMSimulationTest(unittest.TestCase):
             runoff_raw_data = utils.get_runoff_from_pickle(runoff_path)
             
             sim = SWMMSimulation(G, heads_raw_data, runoff_raw_data)
+            simulations.append(sim)
+            if num_saved_events>=max_events:
+                break
             
-            break
-    
-    
-        cls.sim = sim
+            num_saved_events+= 1
+            
+        event_to_test= 2
+        cls.sim = simulations[event_to_test]
 
     @classmethod
     def tearDownClass(cls):
@@ -75,13 +81,36 @@ class SWMMSimulationTest(unittest.TestCase):
     def test_window_not_created_when_out_of_bounds(self):
         with self.assertRaises(ValueError):
             self.assert_window_x_has_right_shape(steps_ahead=1, time=10e6)
-
     
     def test_window_y_isNxTimeSteps(self):
         self.assert_window_y_has_right_shape(steps_ahead=1, time=0)
+        
+    def test_get_list_of_windows_composition(self):
+        steps_ahead = 1
+        all_windows = self.sim.get_all_windows(steps_ahead)
+        
+        self.assertIsInstance(all_windows, list)
+        for window in all_windows:
+            self.assertIsInstance(window, Data)
+
+    def test_list_of_windows_length(self):
+        with self.assertRaises(AssertionError):
+            for steps in range(2):
+                self.assertNumberOfWindows_with(steps_ahead = steps)   
+        
+        self.assertNumberOfWindows_with(steps_ahead = int(10e6))
+
+    
+
+
+
 
     #Auxiliary functions----------------------------------------------------------------
-
+    def assertNumberOfWindows_with(self, steps_ahead):
+        all_windows = self.sim.get_all_windows(steps_ahead)
+        num_windows_ideal = self.sim.simulation_length//steps_ahead
+        num_windows_current = len(all_windows)         
+        self.assertEqual(num_windows_current, num_windows_ideal)
     def assert_window_x_has_right_shape(self, steps_ahead, time):
         window = self.sim.get_window(steps_ahead, time)
         x = window.x
@@ -97,7 +126,6 @@ class SWMMSimulationTest(unittest.TestCase):
         desired_shape = (num_nodes, steps_ahead)
         self.assertTrue(y.shape, desired_shape)
     
-    
-    
+
 if __name__ == '__main__':
     unittest.main()

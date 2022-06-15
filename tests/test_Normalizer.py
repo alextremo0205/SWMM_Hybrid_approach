@@ -14,7 +14,6 @@ class NormalizerTest(unittest.TestCase):
     def tearDownClass(cls):
         pass
         
-        
     #Unit tests ----------------------------------------------------------------
     def test_empty(self):
         self.assertEqual(0,0)

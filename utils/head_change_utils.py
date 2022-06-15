@@ -153,7 +153,7 @@ def inp_to_G(lines):
     
     nx.set_node_attributes(G, nodes_coordinates, "pos")
     nx.set_node_attributes(G, nodes_elevation, "elevation")
-    nx.set_node_attributes(G, nodes_names_dict, 'nodes_names')
+    nx.set_node_attributes(G, nodes_names_dict, 'name_nodes')
     
     subcathments_attributes = get_subcatchments(lines, inp_dict)
     nx.set_node_attributes(G, subcathments_attributes)

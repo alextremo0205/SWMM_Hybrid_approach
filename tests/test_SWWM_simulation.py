@@ -42,6 +42,7 @@ class SWMMSimulationTest(unittest.TestCase):
         del cls.yaml_data
         del cls.sim
 
+    #Unit tests----------------------------------------------------------------
 
     def test_swmmSimulation_exists(self):
         self.assertTrue(self.sim != None)
@@ -64,14 +65,39 @@ class SWMMSimulationTest(unittest.TestCase):
         self.assertIsInstance(window, Data)
         
     def test_window_x_isNxF(self):
-        steps_ahead=1
-        window = self.sim.get_window(steps_ahead, time = 0)
+        self.assert_window_x_has_right_shape(steps_ahead=1, time=0)
+        self.assert_window_x_has_right_shape(steps_ahead=4, time=0)
+        self.assert_window_x_has_right_shape(steps_ahead=30, time=0)
+        
+        self.assert_window_x_has_right_shape(steps_ahead=1, time=1)
+        self.assert_window_x_has_right_shape(steps_ahead=1, time=10)
+        
+    def test_window_not_created_when_out_of_bounds(self):
+        with self.assertRaises(ValueError):
+            self.assert_window_x_has_right_shape(steps_ahead=1, time=10e6)
+
+    
+    def test_window_y_isNxTimeSteps(self):
+        self.assert_window_y_has_right_shape(steps_ahead=1, time=0)
+
+    #Auxiliary functions----------------------------------------------------------------
+
+    def assert_window_x_has_right_shape(self, steps_ahead, time):
+        window = self.sim.get_window(steps_ahead, time)
+        x = window.x
         num_nodes = window.num_nodes
         num_x_features = window.num_node_features
-        x = window.x
-        
-        
-        self.assertTrue(x.shape, (num_nodes, num_x_features))
+        desired_shape = (num_nodes, num_x_features)
+        self.assertTrue(x.shape, desired_shape)
+    
+    def assert_window_y_has_right_shape(self, steps_ahead, time):
+        window = self.sim.get_window(steps_ahead, time)
+        y = window.y
+        num_nodes = window.num_nodes
+        desired_shape = (num_nodes, steps_ahead)
+        self.assertTrue(y.shape, desired_shape)
+    
+    
     
 if __name__ == '__main__':
     unittest.main()

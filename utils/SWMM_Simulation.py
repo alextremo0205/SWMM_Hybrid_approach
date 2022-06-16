@@ -30,12 +30,14 @@ class SWMMSimulation:
         ro_timeperiod =     self.get_ro_for_window(time, steps_ahead)
         ht_timeperiod =     self.get_ht_for_window(time, steps_ahead)
         
-        input_features_dict=    self.get_features_dictionary(h0, ro_timeperiod)
+        h_x_dict=    self.get_features_dictionary(h0)
+        ro_x_dict =  self.get_features_dictionary(ro_timeperiod)
         output_features_dict=   self.get_features_dictionary(ht_timeperiod)
         
         G_for_window =      self.G
-        nx.set_node_attributes(G_for_window, input_features_dict, name = 'x')
-        nx.set_node_attributes(G_for_window, output_features_dict,name = 'y')
+        nx.set_node_attributes(G_for_window, h_x_dict, name = 'h_x')
+        nx.set_node_attributes(G_for_window, ro_x_dict, name ='runoff')
+        nx.set_node_attributes(G_for_window, output_features_dict,name = 'h_y')
         
         window = from_networkx(G_for_window)
 
@@ -62,6 +64,5 @@ class SWMMSimulation:
         return input_features_dict
 
 
-        
-        
-       
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}()'

@@ -278,9 +278,9 @@ def get_x_sections(lines, inp_dict):
             x_sections_attributes ={}
             l_split = line.split()
 
-            x_sections_attributes['shape'] = l_split[1]
-            x_sections_attributes['geom_1'] = l_split[2]
-            x_sections_attributes['geom_2'] = l_split[3]
+            x_sections_attributes['shape'] =  l_split[1]
+            x_sections_attributes['geom_1'] = float(l_split[2])
+            x_sections_attributes['geom_2'] = float(l_split[3])
             #It can continue, but I don't use the rest of the values
 
             x_sections[l_split[0]]=x_sections_attributes

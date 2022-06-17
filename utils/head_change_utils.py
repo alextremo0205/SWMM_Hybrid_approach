@@ -324,48 +324,48 @@ def count_parameters(model):
 
 # Plotting ---------------------------------------------------
 
-def plot_head_changes(node_name, single_node_x, single_node_y):
-    fig = go.Figure()
-    scatter_one_node_x_y= get_scatter_trace(single_node_x, single_node_y)
-    fig.add_trace(scatter_one_node_x_y)
+# def plot_head_changes(node_name, single_node_x, single_node_y):
+#     fig = go.Figure()
+#     scatter_one_node_x_y= get_scatter_trace(single_node_x, single_node_y)
+#     fig.add_trace(scatter_one_node_x_y)
 
-    fig.update_yaxes(
-        scaleanchor = "x",
-        scaleratio = 1,
-    )
-    fig.update_layout(
-        width = 500,
-        height = 500,
-        title = "%s Head changes" % (node_name)
-    )
+#     fig.update_yaxes(
+#         scaleanchor = "x",
+#         scaleratio = 1,
+#     )
+#     fig.update_layout(
+#         width = 500,
+#         height = 500,
+#         title = "%s Head changes" % (node_name)
+#     )
 
-    fig.update_layout(
-            shapes=[
-                dict(
-                    type= 'line',
-                    y0= 0, 
-                    y1= 1, 
-                    x0= 0, 
-                    x1= 1
-                )
-            ])
-    return fig
+#     fig.update_layout(
+#             shapes=[
+#                 dict(
+#                     type= 'line',
+#                     y0= 0, 
+#                     y1= 1, 
+#                     x0= 0, 
+#                     x1= 1
+#                 )
+#             ])
+#     return fig
 
 
-def get_scatter_trace(x, y):
-    trace = go.Scatter(x=x, y=y, mode='markers')
-    return trace
+# def get_scatter_trace(x, y):
+#     trace = go.Scatter(x=x, y=y, mode='markers')
+#     return trace
 
-def animate_nodal_depth(df):
-    net = px.scatter(
-        df, 
-        x="x_coord", 
-        y="y_coord", 
-        size="Depth", 
-        animation_frame="Time", 
-        size_max=20, 
-        hover_name="Node",
-        width=500, 
-        height=800
-        )
-    return net
+# def animate_nodal_depth(df):
+#     net = px.scatter(
+#         df, 
+#         x="x_coord", 
+#         y="y_coord", 
+#         size="Depth", 
+#         animation_frame="Time", 
+#         size_max=20, 
+#         hover_name="Node",
+#         width=500, 
+#         height=800
+#         )
+#     return net

@@ -20,5 +20,5 @@ class GNNModel(torch.nn.Module):
     
     
     def __repr__(self) -> str:
-        return (f'{self.__class__.__name__}({self.DynEM_layer}, ')
+        return (f'{self.__class__.__name__}({self.DynEM_layer}')
                 

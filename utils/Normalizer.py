@@ -106,16 +106,14 @@ class Normalizer:
     
     def normalize_runoff_min_max(self, original_runoff):
         return (original_runoff-self.min_runoff)/(self.max_runoff-self.min_runoff)
-    
-    
+   
     def normalize_length_min_max(self, original_length):
         return (original_length-self.min_length)/(self.max_length-self.min_length)
     
     def normalize_geom_1_min_max(self, original_geom_1):
         return (original_geom_1-self.min_geom_1)/(self.max_geom_1-self.min_geom_1)
     
-    
-    
+
     def get_dataloader(self, batch_size):
         list_of_windows = self.get_list_normalized_training_windows()
         return DataLoader(list_of_windows, batch_size)

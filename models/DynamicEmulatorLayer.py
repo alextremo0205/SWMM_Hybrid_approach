@@ -48,7 +48,7 @@ class DynEm(MessagePassing):
         new_h = torch.max(candidate_h, norm_elev)
         
         #Outfall condition!
-        new_h[-2:] = norm_elev[-2:]
+        # new_h[-2:] = norm_elev[-2:]
         
         return new_h
     
@@ -72,5 +72,5 @@ class DynEm(MessagePassing):
     
     def __repr__(self) -> str:
         return (f'{self.__class__.__name__}({self.interchangeANN}, aggr={self.aggr}')
-                # f'{self.out_channels},,)')
+                
     

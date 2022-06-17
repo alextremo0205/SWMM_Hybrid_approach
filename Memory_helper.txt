@@ -53,3 +53,6 @@ Pass the diameter multiple times to the ANN that calculates dh due to gradient.
 
 2022-06-15 10:10:59
 Include the manhole area as node attribute.
+
+2022-06-17 12:23:41
+For some reason, it is returning a number 2 in the mask values.

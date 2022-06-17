@@ -1,3 +1,49 @@
+
+
+
+
+
+
+
+
+
+    # def test_GNN_output_above_ground(self):
+    #     output = self.GNN_model(self.trial_window)
+    #     min_elev = self.trial_window['norm_elev']
+    #     all_heads_are_above_ground = torch.all(torch.ge(output, min_elev))
+        
+    #     self.assertTrue(all_heads_are_above_ground.item())
+        
+    # def test_vector_says_if_dry_or_not(self):
+    #     output = self.GNN_model(self.trial_window)
+    #     # min_elev = self.trial_window['norm_elev']
+    #     some_node_is_dry = torch.all(output)
+        
+    #     self.assertTrue(some_node_is_dry.item())
+
+    # def test_vector_there_should_be_flow_to(self):
+    #     output = self.GNN_model(self.trial_window)
+    #     print(output)
+    #     someflow = torch.any(output)
+    #     self.assertTrue(someflow.item())
+        
+        
+    # def test_vector_is_min_or_20(self):
+    #     output = self.GNN_model(self.trial_window)
+    #     print(output.shape)
+    #     for i in output:
+    #         val = i.item()
+    #         self.assertTrue((val==0.0 or val == 1.0))
+        
+
+
+# def test_GNN_has_trainable_parameters(self):
+#     self.assertGreater(utils.count_parameters(self.GNN_model), 0)
+
+
+
+
+
 # def normalize_min_max(value, max,min):
 #     return (value - min)/(max-min)
 

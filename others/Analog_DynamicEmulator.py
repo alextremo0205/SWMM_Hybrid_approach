@@ -155,8 +155,6 @@ class DynamicEmulator:
         
         return ans
         
-        
-
 
 def is_giver_manhole_dry(hi, hi_min, hj, hj_min):
     ans = (hi == hi_min and hj < hi) or (hj == hj_min and hi < hj)

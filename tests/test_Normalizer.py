@@ -1,6 +1,7 @@
 import unittest
 
 from torch_geometric.data import Data
+from torch_geometric.loader import DataLoader
 
 import sys
 sys.path.insert(0, '')
@@ -58,13 +59,14 @@ class NormalizerTest(unittest.TestCase):
         for window in self.normalizer.training_windows:
             self.assertLessEqual(min_h, window['h_x'].min())
             self.assertLessEqual(min_h, window['h_y'].min())
-
+            self.assertLessEqual(min_h, window['elevation'].min())
 
     def test_h_max(self):
         max_h = self.normalizer.max_h
         for window in self.normalizer.training_windows:
             self.assertGreaterEqual(max_h, window['h_x'].max())
             self.assertGreaterEqual(max_h, window['h_y'].max())
+            self.assertGreaterEqual(max_h, window['elevation'].min())
 
     def test_min_length(self):
         min_length = self.normalizer.min_length
@@ -112,7 +114,9 @@ class NormalizerTest(unittest.TestCase):
         self.assertIsInstance(list_norm_windows, list)
         self.assertIsInstance(list_norm_windows[0], Data)
         
-
+    def test_get_dataloader(self):
+        dataloader = self.normalizer.get_dataloader(batch_size = 10)
+        self.assertIsInstance(dataloader,DataLoader)
     
 if __name__ == '__main__':
     unittest.main()

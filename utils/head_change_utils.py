@@ -178,10 +178,9 @@ def inp_to_G(lines):
     try:
         end = inp_dict['[WEIRS]\n']-1
         
-        # with open(working_inp) as f:
-        # lines = f.readlines()
+        
         for i in range(inp_dict['[WEIRS]\n']+3+1, inp_dict['[XSECTIONS]\n']-1):
-            # print(lines[i].split())
+        
             weir = lines[i].split()[:-4]
             G.add_edge(weir[1],weir[2])
             weirs.append(lines[i])
@@ -232,7 +231,7 @@ def get_elevation_from_type(type_of_node, lines, inp_dict):
     while line != '\n':
         if ';' not in line:
             name, elevation = line.split()[0], line.split()[1]
-            nodes_elevation[name] = elevation
+            nodes_elevation[name] = float(elevation)
         index+=1
         line = lines[index]
     
@@ -320,12 +319,10 @@ def get_subcatchments(lines, inp_dict):
     return subcathments
 
 
-
+def count_parameters(model):
+    return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
 # Plotting ---------------------------------------------------
-
-
-
 
 def plot_head_changes(node_name, single_node_x, single_node_y):
     fig = go.Figure()
@@ -372,10 +369,3 @@ def animate_nodal_depth(df):
         height=800
         )
     return net
-#-----------------------------------------------------------------
-#-----------------------------------------------------------------
-
-##
-def is_it_ready():
-    return True
-

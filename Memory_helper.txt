@@ -56,3 +56,15 @@ Include the manhole area as node attribute.
 
 2022-06-17 12:23:41
 For some reason, it is returning a number 2 in the mask values.
+2022-06-20 09:57:43 : Update: The reason for this was that the 2 meant that 2 pipes were going to flow to a single node.
+                        The number 2 appeared as the sum of the neighbors. It was on the node space, not the pipe space.
+
+
+2022-06-20 09:59:03
+Program, how good is the model working?
+Control + Z to the parameters
+Visualize in equal terms 
+Program the unrolling
+Validation accuracy
+
+

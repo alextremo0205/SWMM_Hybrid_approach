@@ -65,6 +65,6 @@ Program, how good is the model working?
 Control + Z to the parameters
 Visualize in equal terms 
 Program the unrolling
-Validation accuracy
+Validation!!
 
-
+Unnormalize

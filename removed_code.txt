@@ -1,5 +1,182 @@
 
 
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+
+q_transfer_ANN = QInterchangeNN().to(device)
+q_runoff_ANN = QRunoffNN().to(device)
+
+
+wn = DE.DynamicEmulator(inp_path, q_transfer_ANN, q_runoff_ANN)
+
+
+#Draw graph
+wn.draw_nx_layout()
+
+
+wn.set_h(X_train[0][1])
+columns = ['Time' , 'Node', 'Depth', 'x_coord' , 'y_coord']
+df = pd.DataFrame(wn.get_depths_to_rows(0), columns = columns)
+
+for time in range(1):
+    wn.update_h(runoff = X_train[0][2][time]) 
+    new_h_rows = pd.DataFrame(wn.get_depths_to_rows(time+1), columns = columns)
+    df = pd.concat([df,new_h_rows])
+
+
+depth_one_node = df[df['Node']=='j_90376']['Depth'] #.plot() j_90550
+depth_one_node=depth_one_node.reset_index()
+depth_one_node['Depth'].plot()
+
+
+net = utils.animate_nodal_depth(df)
+net.show()
+
+net.write_html('10_06_2022_Depth_dynamic_viz.html')
+
+
+losses_np=[]
+
+optimizer1 = optim.SGD(wn.q_transfer_ANN.parameters(), lr=0.01, momentum=0.9)
+optimizer2 = optim.SGD(wn.q_runoff_ANN.parameters(), lr=0.01, momentum=0.9)
+
+time_steps = 1
+
+for epoch in range(20):
+    epoch_loss =[]
+    for i in range(len(X_train)):
+        
+        wn.set_h(X_train[i][1])
+        losses= []
+        for time in range(time_steps):
+            wn.update_h(runoff = X_train[i][2][time]) 
+
+            pred = torch.cat(list(wn.get_h().values()))
+            target = torch.reshape(torch.tensor(list(y_train[i][time].values())), (-1,1))
+
+            loss = nn.MSELoss()(pred, target)
+            losses.append(loss)
+
+        total_loss = sum(losses)
+        epoch_loss.append(total_loss.detach())
+        
+        if total_loss.requires_grad:
+            # Backpropagate and update weights
+            total_loss.backward()
+            optimizer1.step()
+            optimizer1.zero_grad()#set_to_none=True) 
+
+            optimizer2.step()
+            optimizer2.zero_grad()#set_to_none=True)
+              
+    losses_np.append(np.array(epoch_loss).mean())
+
+
+
+
+pd.Series(np.array(losses_np)).plot()
+
+
+
+# wn.set_h(X_train[0][1])
+# columns = ['Time' , 'Node', 'Depth', 'x_coord' , 'y_coord']
+# df = pd.DataFrame(wn.get_depths_to_rows(0), columns = columns)
+# dummy_validation_rain = [0,0,0,2, 3, 4, 5, 0, 0,10,0 ,0, 0, 10, 10, 20, 30, 0,0 ,0,0,0,0,0,0,0,0,0]
+# for time in range(len(dummy_validation_rain)):
+#     wn.update_h(rain = (dummy_validation_rain[time])/40) 
+#     new_h_rows = pd.DataFrame(wn.get_depths_to_rows(time+1), columns = columns)
+#     df = pd.concat([df,new_h_rows])
+%time
+wn.set_h(X_train[0][1])
+columns = ['Time' , 'Node', 'Depth', 'x_coord' , 'y_coord']
+df = pd.DataFrame(wn.get_depths_to_rows(0), columns = columns)
+# dummy_validation_rain = [0,0,0,2, 3, 4, 5, 0, 0,10,0 ,0, 0, 10, 10, 20, 30, 0,0 ,0,0,0,0,0,0,0,0,0]
+# training_rainfall = dummy_validation_rain#list(rainfall_raw_data.value)
+
+runoffs = [i[2][0] for i in x_values]
+
+for time in range(len(runoffs)):
+    wn.update_h(runoff = runoffs[time]) 
+    new_h_rows = pd.DataFrame(wn.get_depths_to_rows(time+1), columns = columns)
+    df = pd.concat([df,new_h_rows])
+
+
+
+net.write_html('RFTrained_Depth_dynamic_viz.html')
+
+
+
+
+
+
+
+
+
+
+fig = utils.plot_head_changes(node_name, single_node_x, single_node_y)
+fig.show()
+
+
+
+# For a single node
+node_name = 'j_90492'
+single_node_x = []
+single_node_y = []
+length_database = len(normalized_x) #same as y_train
+step=1
+for i in range(length_database):
+    single_node_x.append(normalized_x[i][node_name])
+    single_node_y.append(normalized_y[i][step-1][node_name])
+
+
+
+#It considers all heads with the same scaling
+norm = utils.Normalizer(X_train, y_train)
+
+normalized_x = norm.normalized_h0_in_x
+normalized_y = norm.normalized_ht_in_y
+
+
+
+
+
+
+
+# set aside 20% of train and test data for evaluation
+X_train, X_test, y_train, y_test = train_test_split(x_values, y_values,
+    test_size=0.2, shuffle = True, random_state = 8)
+
+# Use the same function above for the validation set
+X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, 
+    test_size=0.25, random_state= 8) # 0.25 x 0.8 = 0.2
+
+
+x_values = [i[0] for i in couples_x0_ht_1steps]
+y_values = [i[1] for i in couples_x0_ht_1steps]
+
+
+
+# rolled_out_target_hydraulic_heads = []
+
+# for dry_period in val_dry_period_indexes:
+#     heads_no_rain = head_raw_data.iloc[list(dry_period), :]
+#     heads = utils.get_rolled_out_target_hydraulic_heads(heads_no_rain)
+    
+#     rolled_out_target_hydraulic_heads.append(heads)
+
+
+pd.DataFrame(history)['loss'].plot()
+pd.DataFrame(history)['val_loss'].plot()
+
+
+example = 205
+training_windows[example].y - gnn_model(training_windows[example])
+
+
+
+
+
 trial_window = training_windows[0]
 normalized_trial_window =normalizer.normalize_window(trial_window)
 
@@ -37,7 +214,6 @@ normalized_trial_window =normalizer.normalize_window(trial_window)
     #     for i in output:
     #         val = i.item()
     #         self.assertTrue((val==0.0 or val == 1.0))
-        
 
 
 # def test_GNN_has_trainable_parameters(self):

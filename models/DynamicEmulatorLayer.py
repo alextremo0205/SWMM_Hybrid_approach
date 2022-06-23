@@ -11,19 +11,27 @@ class DynEm(MessagePassing):
         self.interchangeANN = InterchangeANN()
         self.runoffANN = RunoffANN()
         
-    def forward(self, edge_index, x, norm_elev, norm_length, norm_geom_1):
+    def forward(self, edge_index, 
+                    x, 
+                    norm_elev,
+                    norm_length, 
+                    norm_geom_1, 
+                    norm_in_offset, 
+                    norm_out_offset):
         out = self.propagate(edge_index, x=x, 
                              norm_elev = norm_elev, 
                              norm_length=norm_length, 
-                             norm_geom_1 = norm_geom_1)
+                             norm_geom_1 = norm_geom_1,
+                             norm_in_offset = norm_in_offset,
+                             norm_out_offset = norm_out_offset)
         return out
     
-    def message(self, x_i, x_j, norm_elev_i, norm_elev_j, norm_length, norm_geom_1):
+    def message(self, x_i, x_j, norm_elev_i, norm_elev_j, norm_length, norm_geom_1, norm_in_offset, norm_out_offset):
         
         hi = x_i[:, 0].reshape(-1,1)
         hj = x_j[:, 0].reshape(-1,1)
         
-        mask_flows = self.get_mask_flows(hi, hj, norm_elev_i, norm_elev_j)
+        mask_flows = self.get_mask_flows(hi, hj, norm_elev_i, norm_elev_j, norm_in_offset, norm_out_offset)
 
         dif = hj-hi
         # assert dif.max().item() <= 1, 'Max. difference is greater than 1'
@@ -54,13 +62,15 @@ class DynEm(MessagePassing):
     
     
     
-    def get_mask_flows(self, hi, hj, norm_elev_i, norm_elev_j):
-
-        hi_dry = torch.eq(hi, norm_elev_i)
-        hj_dry = torch.eq(hj, norm_elev_j)
+    def get_mask_flows(self, hi, hj, norm_elev_i, norm_elev_j, norm_in_offset, norm_out_offset):
+        adjusted_hi = hi + norm_in_offset
+        adjusted_hj = hj + norm_out_offset
         
-        flow_i_to_j = torch.ge(hi, hj)
-        flow_j_to_i = torch.ge(hj, hi)
+        hi_dry = torch.eq(adjusted_hi, norm_elev_i)
+        hj_dry = torch.eq(adjusted_hj, norm_elev_j)
+        
+        flow_i_to_j = torch.ge(adjusted_hi, adjusted_hj)
+        flow_j_to_i = torch.ge(adjusted_hj, adjusted_hi)
         
         node_i_should_flow_but_it_is_dry = torch.logical_and(hi_dry, flow_i_to_j) 
         node_j_should_flow_but_it_is_dry = torch.logical_and(hj_dry, flow_j_to_i) 

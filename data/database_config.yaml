@@ -12,15 +12,14 @@ inp_directory: 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\network
 
 
 #Synthetic rainfalls
-n_synthetic_rainfalls: 10,
+n_synthetic_rainfalls: 100,
 
 # block_values:    [ 0, 20,  0, 30,  0, 40,  0, 30,  0, 20,  0, 10,  0],
 # block_durations: [30, 30, 30, 30, 40, 30, 40, 30, 30, 30, 30, 30, 50],
-block_values: [0, 20, 0],
-block_durations: [20, 60, 90],
+block_values:   [0, 20, 0],
+block_durations:[20, 60, 90],
 
 #Real rains
-n_real_rains: 10,
-
+n_real_rains: 100,
 
 }

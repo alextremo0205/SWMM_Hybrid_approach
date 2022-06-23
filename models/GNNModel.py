@@ -11,10 +11,11 @@ class GNNModel(torch.nn.Module):
         d = copy.deepcopy(data)
         edge_index =    d.edge_index
 
-        norm_elev =     d.norm_elev
-        norm_length =   d.norm_length
-        norm_geom_1 =   d.norm_geom_1
-
+        norm_elev       = d.norm_elev
+        norm_length     = d.norm_length
+        norm_geom_1     = d.norm_geom_1
+        norm_in_offset  = d.norm_in_offset
+        norm_out_offset  = d.norm_out_offset
 
         num_nodes = d.num_nodes
         steps_ahead = d.x.shape[1] - 1
@@ -22,7 +23,7 @@ class GNNModel(torch.nn.Module):
         pred = torch.zeros(num_nodes, steps_ahead)
         for step in range(steps_ahead):
             x = d.x
-            new_h = self.DynEM_layer(edge_index, x, norm_elev, norm_length, norm_geom_1)
+            new_h = self.DynEM_layer(edge_index, x, norm_elev, norm_length, norm_geom_1, norm_in_offset, norm_out_offset)
             
             pred[:, step] = new_h.reshape(-1)
             

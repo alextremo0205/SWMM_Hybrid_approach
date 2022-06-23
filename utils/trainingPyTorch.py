@@ -2,7 +2,9 @@
 
 import time
 
-def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, device='cpu'):
+import torch
+
+def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, device='cpu', report_freq = 10):
 
     print_initial_message(model, optimizer, epochs, device)
 
@@ -14,8 +16,11 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
 
         # --- TRAIN AND EVALUATE ON TRAINING SET -----------------------------
         model.train()
-        train_loss         = 0.0
-
+        train_loss  = 0.0
+        last_loss   = 100
+        patience    = 2
+        trigger_times = 0
+        
         for batch in train_dl:
 
             optimizer.zero_grad()
@@ -50,11 +55,26 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
 
         val_loss = val_loss / len(val_dl.dataset)
 
-        printCurrentStatus(epochs, epoch, train_loss, val_loss)
+        printCurrentStatus(epochs, epoch, train_loss, val_loss, report_freq)
 
         history['loss'].append(train_loss)
         history['val_loss'].append(val_loss)
 
+    
+        # Early stopping
+        current_loss = val_loss
+        if abs(current_loss - last_loss) < 1e-4:
+            trigger_times += 1
+            
+            if trigger_times >= patience:
+                print('Early stopping!', 'The Current Loss:', current_loss)
+                epoch = epochs+1
+
+        else:
+            trigger_times = 0
+
+        last_loss = current_loss
+    
     # END OF TRAINING LOOP
 
 
@@ -67,8 +87,8 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
 
     return history
 
-def printCurrentStatus(epochs, epoch, train_loss, val_loss):
-    if epoch == 1 or epoch % 10 == 0:
+def printCurrentStatus(epochs, epoch, train_loss, val_loss, report_freq):
+    if epoch == 1 or epoch % report_freq == 0:
       print('Epoch %3d/%3d, train loss: %5.2f, val loss: %5.2f' % \
                 (epoch, epochs, train_loss, val_loss))
 

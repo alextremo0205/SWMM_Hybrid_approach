@@ -48,20 +48,21 @@ class Normalizer:
         
         return extreme
     
-    
     def get_list_normalized_training_windows(self):
         list_norm_windows = [self.normalize_window(window) for window in self.training_windows]
         return(list_norm_windows)
     
     def normalize_window(self, window):
         
-        window_with_x =         self.add_x_normalized_features(window)
-        window_with_y =         self.add_y_normalized_features(window_with_x)
-        window_with_elev =      self.add_elev_norm_features(window_with_y)
-        window_with_geom_1 =    self.add_geom_1_norm_features(window_with_elev)
-        window_with_length =    self.add_length_norm_features(window_with_geom_1)
+        window_with_x           = self.add_x_normalized_features(window)
+        window_with_y           = self.add_y_normalized_features(window_with_x)
+        window_with_elev        = self.add_elev_norm_features(window_with_y)
+        window_with_geom_1      = self.add_geom_1_norm_features(window_with_elev)
+        window_with_length      = self.add_length_norm_features(window_with_geom_1)
+        window_with_in_offset   = self.add_in_offset_norm_features(window_with_length)
+        window_with_out_offset  = self.add_out_offset_norm_features(window_with_in_offset)
         
-        final_normalized_window = window_with_length
+        final_normalized_window = window_with_out_offset
         return final_normalized_window
 
     def add_x_normalized_features(self, window):
@@ -74,7 +75,6 @@ class Normalizer:
     
     def add_y_normalized_features(self, window):
         norm_h_y = self.normalize_h_min_max(window['h_y'])
-        
         window['y'] = norm_h_y
         return window
     
@@ -85,6 +85,19 @@ class Normalizer:
         
         return window
     
+    def add_in_offset_norm_features(self, window):
+        norm_in_offset = self.normalize_h_min_max(window['in_offset'])
+        norm_in_offset = norm_in_offset.reshape(-1,1)
+        window['norm_in_offset'] = norm_in_offset
+        
+        return window
+   
+    def add_out_offset_norm_features(self, window):
+        norm_out_offset = self.normalize_h_min_max(window['out_offset'])
+        norm_out_offset = norm_out_offset.reshape(-1,1)
+        window['norm_out_offset'] = norm_out_offset
+        return window
+   
     
     def add_geom_1_norm_features(self, window):
         norm_geom_1 = self.normalize_geom_1_min_max(window['geom_1'])
@@ -113,13 +126,10 @@ class Normalizer:
         return (original_geom_1-self.min_geom_1)/(self.max_geom_1-self.min_geom_1)
     
 
-
     def unnormalize_heads(self, normalizedHeads):
         return (normalizedHeads)*(self.max_h-self.min_h) + self.min_h
         
         
-        
-
     def get_dataloader(self, batch_size):
         list_of_windows = self.get_list_normalized_training_windows()
         return DataLoader(list_of_windows, batch_size)

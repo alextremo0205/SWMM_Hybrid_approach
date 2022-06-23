@@ -112,6 +112,14 @@ def rain_blocks(values, durations, dt):
     return ans
 
 
+
+def get_max_from_raindict(dict_rain):
+    list_of_values = list(dict_rain.values())
+    return np.array(list_of_values).max()
+
+
+
+
 # Generator of inp-readable lines for the rainfalls
 def new_rain_lines(rainfall_dict, name_new_rain = 'name_new_rain'):
 

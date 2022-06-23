@@ -66,3 +66,9 @@ Program the unrolling
 How good is the model working?
 Visualize in equal terms 
 Control + Z to the parameters
+
+2022-06-23 10:44:52
+Validation is implemented. After this, do not touch the database. Better, only add examples.
+Before going to visualization, I'll implement the new version of is_giver_manhole_dry
+Expanding features
+Priority: Visualization of unnormalized results.

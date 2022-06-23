@@ -15,7 +15,7 @@ class NormalizerTest(unittest.TestCase):
         cls.yaml_data = utils.load_yaml(yaml_path)
         
         inp_path = cls.yaml_data['inp_path']
-        simulations_path = cls.yaml_data['simulations_path']
+        simulations_path = cls.yaml_data['training_simulations_path']
         
         simulations = utils.extract_simulations_from_folders(simulations_path, 
                                                              inp_path, 
@@ -128,8 +128,16 @@ class NormalizerTest(unittest.TestCase):
         self.assertIsInstance(unnormalized_heads,torch.Tensor)
         self.assertTrue(torch.all(torch.isclose(unnormalized_heads, original_y)).item())
         
-    # def test
+    def test_normalize_in_offset(self):
+        norm_in_offset = self.normalized_window['norm_in_offset']
+        self.assertIsInstance(norm_in_offset, torch.Tensor)
+        self.assertTrue(torch.all(torch.ge(norm_in_offset, 0)).item())
+        self.assertTrue(torch.all(torch.le(norm_in_offset, 1)).item())
     
+    
+    def test_normalize_out_offset(self):
+        norm_out_offset = self.normalized_window['norm_out_offset']
+        self.assertIsInstance(norm_out_offset, torch.Tensor)
     
 if __name__ == '__main__':
     unittest.main()

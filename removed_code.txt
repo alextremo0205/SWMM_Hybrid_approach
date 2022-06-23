@@ -1,5 +1,8 @@
 
 
+trial_window = training_windows[0]
+normalized_trial_window =normalizer.normalize_window(trial_window)
+
 
 
 

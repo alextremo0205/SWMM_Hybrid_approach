@@ -21,7 +21,7 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
             optimizer.zero_grad()
 
             x    = batch.to(device)            
-            y    = batch.y[:,0].reshape(-1,1).to(device)
+            y    = batch.y.to(device)
             
             yhat = model(x)
             
@@ -42,7 +42,7 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
         for batch in val_dl:
 
             x    = batch.to(device)
-            y    = batch.y[:,0].reshape(-1,1).to(device)
+            y    = batch.y.to(device)
             yhat = model(x)
             loss = loss_fn(yhat, y)
 

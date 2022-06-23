@@ -26,8 +26,8 @@ class DynEm(MessagePassing):
         mask_flows = self.get_mask_flows(hi, hj, norm_elev_i, norm_elev_j)
 
         dif = hj-hi
-        assert dif.max().item() <= 1, 'Max. difference is greater than 1'
-        assert dif.min().item() >= -1, 'Min. difference is less than -1'
+        # assert dif.max().item() <= 1, 'Max. difference is greater than 1'
+        # assert dif.min().item() >= -1, 'Min. difference is less than -1'
         
         x_interchange = torch.concat((dif, norm_length, norm_geom_1, mask_flows), axis=1)
         nn_interchange = self.interchangeANN(x_interchange)

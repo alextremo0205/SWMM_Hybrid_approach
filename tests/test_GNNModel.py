@@ -19,10 +19,10 @@ class TestGNNModel(unittest.TestCase):
                                                              inp_path, 
                                                              max_events = 5)
         training_windows = []
-        events_to_train= [0,1]
+        events_to_train = [0,1]
         for event in events_to_train:
             sim = simulations[event]
-            training_windows += sim.get_all_windows(steps_ahead = 3)
+            training_windows += sim.get_all_windows(steps_ahead = 2)
         
         cls.normalizer = Normalizer(training_windows)
         cls.trial_window = cls.normalizer.get_list_normalized_training_windows()[0]
@@ -40,7 +40,9 @@ class TestGNNModel(unittest.TestCase):
     def test_GNN_output_is_right_shape(self):
         output = self.GNN_model(self.trial_window)
         num_nodes = self.trial_window.num_nodes
-        self.assertEqual(output.shape, (num_nodes, 1))
+        num_timesteps = self.trial_window['steps_ahead']
+        
+        self.assertEqual(output.shape, (num_nodes, num_timesteps))
     
     def test_GNN_has_trainable_parameters(self):
         self.assertGreater(utils.count_parameters(self.GNN_model), 0)

@@ -2,7 +2,9 @@
 {
 
 # networks names
-simulations_path : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations',
+training_simulations_path : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\training',
+validation_simulations_path : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\validation',
+testing_simulations_path : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\testing',
 inp_path: 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\networks\Tuindorp_Right_Part.inp',
 
 }

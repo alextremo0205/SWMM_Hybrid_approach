@@ -41,6 +41,8 @@ class SWMMSimulation:
         
         window = from_networkx(G_for_window)
 
+        window['steps_ahead'] = steps_ahead
+        
         return window
 
     def checkOutOfBounds(self, steps_ahead, time):

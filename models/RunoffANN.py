@@ -5,16 +5,16 @@ class RunoffANN(nn.Module):
     def __init__(self):
         super(RunoffANN, self).__init__()
         
-        self.linear_relu_stack = nn.Sequential(
+        self.linear_stack = nn.Sequential(
             nn.Linear(1, 16),
-            nn.Sigmoid(),
+            nn.ReLU(),
             nn.Linear(16, 8),
-            nn.Sigmoid(),
+            nn.ReLU(),
             nn.Linear(8, 1),
-            nn.Sigmoid()
+            nn.ReLU()
         )
     def forward(self, x):
         
-        x = self.linear_relu_stack(x)
+        x = self.linear_stack(x)
         
         return x

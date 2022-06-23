@@ -61,10 +61,8 @@ For some reason, it is returning a number 2 in the mask values.
 
 
 2022-06-20 09:59:03
-Program, how good is the model working?
-Control + Z to the parameters
-Visualize in equal terms 
-Program the unrolling
 Validation!!
-
-Unnormalize
+Program the unrolling
+How good is the model working?
+Visualize in equal terms 
+Control + Z to the parameters

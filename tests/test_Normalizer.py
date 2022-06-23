@@ -118,5 +118,18 @@ class NormalizerTest(unittest.TestCase):
         dataloader = self.normalizer.get_dataloader(batch_size = 10)
         self.assertIsInstance(dataloader,DataLoader)
     
+    def test_unnormalize_heads(self):
+        
+        trial_y = self.normalized_window['y']
+        original_y = self.normalized_window['h_y']
+        
+        unnormalized_heads = self.normalizer.unnormalize_heads(trial_y)
+        
+        self.assertIsInstance(unnormalized_heads,torch.Tensor)
+        self.assertTrue(torch.all(torch.isclose(unnormalized_heads, original_y)).item())
+        
+    # def test
+    
+    
 if __name__ == '__main__':
     unittest.main()

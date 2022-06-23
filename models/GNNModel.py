@@ -1,3 +1,4 @@
+import copy
 import torch
 from models.DynamicEmulatorLayer import DynEm
 
@@ -7,14 +8,30 @@ class GNNModel(torch.nn.Module):
         self.DynEM_layer = DynEm()
         
     def forward(self, data):
-        edge_index =    data.edge_index
-        x =             data.x
-        norm_elev =     data.norm_elev
-        norm_length =   data.norm_length
-        norm_geom_1 =   data.norm_geom_1
-        
-        pred = self.DynEM_layer(edge_index, x, norm_elev, norm_length, norm_geom_1)
+        d = copy.deepcopy(data)
+        edge_index =    d.edge_index
 
+        norm_elev =     d.norm_elev
+        norm_length =   d.norm_length
+        norm_geom_1 =   d.norm_geom_1
+
+
+        num_nodes = d.num_nodes
+        steps_ahead = d.x.shape[1] - 1
+        
+        pred = torch.zeros(num_nodes, steps_ahead)
+        for step in range(steps_ahead):
+            x = d.x
+            new_h = self.DynEM_layer(edge_index, x, norm_elev, norm_length, norm_geom_1)
+            
+            pred[:, step] = new_h.reshape(-1)
+            
+            new_runoff = x[:, 2:]
+            
+            new_x = torch.cat((new_h, new_runoff), dim = 1)
+            
+            d['x'] = new_x
+            
         return pred
     
     

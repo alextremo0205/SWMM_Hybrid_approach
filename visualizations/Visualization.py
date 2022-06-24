@@ -2,6 +2,7 @@ import io
 from PIL import Image
 import plotly.io as pio
 
+import torch
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
@@ -87,6 +88,9 @@ columns = ['Time' , 'Node', 'Depth', 'x_coord' , 'y_coord']
 
 # net = utils.animate_nodal_depth(df)
 
+
+
+
 def animate_nodal_depth(df):
     net = px.scatter(
         df, 
@@ -103,8 +107,24 @@ def animate_nodal_depth(df):
 
 
 
-def plot_nodal_variable():
-    scatter_trace = go.Scatter()
+def plot_nodal_variable(value, ref_window, colorscale ='PuBu'):
+    node_names = ref_window.name_nodes
+    coordinates = ref_window.pos.numpy()
+    x_coord = coordinates[:,0]
+    y_coord = coordinates[:,1]
 
+    if type(value)==torch.Tensor:
+        value = value.numpy()
+    
+    sizeref = 2. * max(value) / (7. ** 2)
+    scatter_trace= go.Scatter(x=x_coord, y=y_coord,
+                    mode='markers',
+                    name='coordinates',
+                    text = node_names,
+                    marker_size=value,
+                    marker=dict(color=value,showscale=True, sizeref=sizeref, colorscale=colorscale,  
+                                line=dict(width=2,color='DarkSlateGrey')),
+                    
+                    )
     return scatter_trace    
     

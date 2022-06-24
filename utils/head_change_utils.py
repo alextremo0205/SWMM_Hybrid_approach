@@ -322,6 +322,18 @@ def get_subcatchments(lines, inp_dict):
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
+
+
+def tensor_heads_to_normalized_pd(tensor_heads, normalizer, name_nodes):
+    normalized_heads_tensor = normalizer.unnormalize_heads(tensor_heads)
+    normalized_heads_np = normalized_heads_tensor.detach().numpy()
+    normalized_heads_pd = pd.DataFrame(dict(zip(name_nodes, normalized_heads_np)))
+    return normalized_heads_pd
+
+
+def head_to_depth(head, normalizer, ref_window):
+    return normalizer.unnormalize_heads(head-ref_window.norm_elev.reshape(-1))-normalizer.min_h
+
 # Plotting ---------------------------------------------------
 
 # def plot_head_changes(node_name, single_node_x, single_node_y):

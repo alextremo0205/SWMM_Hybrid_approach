@@ -2,8 +2,6 @@
 
 import time
 
-import torch
-
 def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, device='cpu', report_freq = 10):
 
     print_initial_message(model, optimizer, epochs, device)
@@ -33,9 +31,10 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
             yhat = model(x)
             
             loss = loss_fn(yhat, y)
-
-            loss.backward()
-            optimizer.step()
+            
+            if loss.requires_grad:
+                loss.backward()
+                optimizer.step()
 
             train_loss         += loss.data.item() * x.size(0)
         

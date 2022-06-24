@@ -6,11 +6,11 @@ class InterchangeANN(nn.Module):
         super(InterchangeANN, self).__init__()
         
         self.linear_stack = nn.Sequential(
-            nn.Linear(4, 16),
+            nn.Linear(4, 8),
             nn.ReLU(),
-            nn.Linear(16, 8),
+            nn.Linear(8, 4),
             nn.ReLU(),
-            nn.Linear(8, 1),
+            nn.Linear(4, 1),
             nn.ReLU()
         )
     def forward(self, x):

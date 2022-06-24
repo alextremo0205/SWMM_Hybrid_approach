@@ -14,9 +14,9 @@ class SWMMSimulation:
         
     def get_all_windows(self, steps_ahead):
         assert steps_ahead>0, "The steps should be greater than 0"
-        max_time_allowed = self.simulation_length - steps_ahead
+        max_time_allowed = (self.simulation_length - steps_ahead) - 1
         windows_list = []
-        for time in range(0, max_time_allowed+1, steps_ahead):
+        for time in range(0, max_time_allowed, steps_ahead):
             window = self.get_window(steps_ahead, time)
             windows_list.append(window)
 
@@ -56,7 +56,7 @@ class SWMMSimulation:
         return self.runoff_raw_data.iloc[time:time+steps_ahead,:]
 
     def get_ht_for_window(self, time, steps_ahead):
-        return self.heads_raw_data.iloc[time:time+steps_ahead,:]
+        return self.heads_raw_data.iloc[time+1:time+steps_ahead+1,:]
 
     def get_features_dictionary(self, *args):
         features_df = pd.concat(args).reset_index(drop =True).transpose()  

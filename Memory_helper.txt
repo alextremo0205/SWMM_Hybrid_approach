@@ -72,3 +72,14 @@ Validation is implemented. After this, do not touch the database. Better, only a
 Before going to visualization, I'll implement the new version of is_giver_manhole_dry
 Expanding features
 Priority: Visualization of unnormalized results.
+
+
+2022-06-24 10:22:01
+I need the rolled out version of the depths
+Include t-1 as Roberto recommended
+Sliding window instead of separated windows
+Reduce the complexity of the auxiliary MLPs
+
+
+2022-06-24 10:38:04
+Apparently there is an error with the window creation. It is not sliding correctly.

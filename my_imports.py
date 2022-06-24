@@ -22,7 +22,7 @@ from models.GNNModel import GNNModel
 from utils.Normalizer import Normalizer
 from utils.trainingPyTorch import train
 from utils.SWMM_Simulation import SWMMSimulation
-
+import visualizations.Visualization as viz
 
 import utils.head_change_utils as utils
 # from models.mlp_q_interchange import QInterchangeNN, QRunoffNN

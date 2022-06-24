@@ -63,8 +63,8 @@ class DynEm(MessagePassing):
     
     
     def get_mask_flows(self, hi, hj, norm_elev_i, norm_elev_j, norm_in_offset, norm_out_offset):
-        adjusted_hi = hi + norm_in_offset
-        adjusted_hj = hj + norm_out_offset
+        adjusted_hi = hi + norm_out_offset
+        adjusted_hj = hj + norm_in_offset
         
         hi_dry = torch.eq(adjusted_hi, norm_elev_i)
         hj_dry = torch.eq(adjusted_hj, norm_elev_j)

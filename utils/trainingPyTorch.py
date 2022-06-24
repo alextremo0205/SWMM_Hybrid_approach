@@ -12,14 +12,16 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
 
     start_time_sec = time.time()
 
+    
+    last_loss   = 100
+    patience    = 3
+    trigger_times = 0
+
     for epoch in range(1, epochs+1):
 
         # --- TRAIN AND EVALUATE ON TRAINING SET -----------------------------
         model.train()
         train_loss  = 0.0
-        last_loss   = 100
-        patience    = 2
-        trigger_times = 0
         
         for batch in train_dl:
 
@@ -57,8 +59,8 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
 
         printCurrentStatus(epochs, epoch, train_loss, val_loss, report_freq)
 
-        history['loss'].append(train_loss)
-        history['val_loss'].append(val_loss)
+        history['Training loss'].append(train_loss)
+        history['Validation loss'].append(val_loss)
 
     
         # Early stopping
@@ -68,7 +70,7 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
             
             if trigger_times >= patience:
                 print('Early stopping!', 'The Current Loss:', current_loss)
-                epoch = epochs+1
+                break
 
         else:
             trigger_times = 0
@@ -95,8 +97,8 @@ def printCurrentStatus(epochs, epoch, train_loss, val_loss, report_freq):
 
 def initialize_history():
     history = {}
-    history['loss'] = []
-    history['val_loss'] = []
+    history['Training loss'] = []
+    history['Validation loss'] = []
     return history
 
 

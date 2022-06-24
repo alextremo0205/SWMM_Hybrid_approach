@@ -3,6 +3,7 @@ from PIL import Image
 import plotly.io as pio
 
 import pandas as pd
+import plotly.express as px
 import plotly.graph_objs as go
 
 
@@ -18,7 +19,6 @@ def plot_loss(history):
     fig = style_loss_fig(fig)
     
     fig.show()
-
 
 def get_scatter_from_dict(history, field):
     df = pd.DataFrame(history)
@@ -37,7 +37,6 @@ def get_scatter_from_dict(history, field):
     
     return scatter_trace
    
-
 def style_loss_fig(fig):
     margin = 80
     
@@ -66,89 +65,46 @@ def show(fig):
 
 
 
-if __name__ == '__main__':
-    history = {
-        'Training loss':
-            {0:1,
-            1:2,
-            2:3,
-            3:4
-            },
-        'Validation loss':
-            {0:2,
-            1:3,
-            2:4,
-            3:5}
-    }
+
+# def get_depths_to_rows(self,timestep):
+    # rows = [[timestep, node, (depth - self.original_min[node]).item(), self.pos[node][0], self.pos[node][1]] for node, depth in self.h.items()]
+#     return rows
+
+columns = ['Time' , 'Node', 'Depth', 'x_coord' , 'y_coord']
+
+# df = pd.DataFrame(wn.get_depths_to_rows(0), columns = columns)
+
+# for time in range(1):
+#     wn.update_h(runoff = X_train[0][2][time]) 
+#     new_h_rows = pd.DataFrame(wn.get_depths_to_rows(time+1), columns = columns)
+#     df = pd.concat([df,new_h_rows])
+
+
+# depth_one_node = df[df['Node']=='j_90376']['Depth'] #.plot() j_90550
+# depth_one_node=depth_one_node.reset_index()
+# depth_one_node['Depth'].plot()
+
+
+# net = utils.animate_nodal_depth(df)
+
+def animate_nodal_depth(df):
+    net = px.scatter(
+        df, 
+        x="x_coord", 
+        y="y_coord", 
+        size="Depth", 
+        animation_frame="Time", 
+        size_max=20, 
+        hover_name="Node",
+        width=500, 
+        height=800
+        )
+    return net
+
+
+
+def plot_nodal_variable():
+    scatter_trace = go.Scatter()
+
+    return scatter_trace    
     
-    
-    fig = go.Figure()
-    
-    scatter_loss     = get_scatter_from_dict(history, 'Training loss')
-    scatter_val_loss = get_scatter_from_dict(history, 'Validation loss')
-    
-    fig.add_trace(scatter_loss)
-    fig.add_trace(scatter_val_loss)
-    
-    fig = style_loss_fig(fig)
-    
-    show(fig)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# import pandas as pd
-# from matplotlib import pyplot as plt
-
-# def plot_loss(history):
-#     fig, ax = plt.subplots(nrows = 1, ncols = 1)
-#     df = pd.DataFrame(history)
-
-#     fig, ax = plt.subplots()
-#     plt.style.use('seaborn')
-#     ax.plot(df['Loss'])
-    
-#     return fig, ax
-
-
-# if __name__ == '__main__':
-
-    
-#     fig, ax = plot_loss(history)
-#     plt.show()
-    
-# # ax.set_xlabel('Epochs')
-# # ax.set_ylabel('MSE Loss')
-# # ax.set_title('')
-
-# # plt.tight_layout
-# # plt.show()

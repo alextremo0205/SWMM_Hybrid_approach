@@ -36,14 +36,14 @@ class DynEm(MessagePassing):
         
         mask_flows = self.get_mask_flows(hi, hj, norm_elev_i, norm_elev_j, norm_in_offset, norm_out_offset)
 
-        dif = hj-hi
+        dif = nn.Tanh()(hj-hi)
 
-        if dif.max().item() >= 1:
-            print('dif max:', dif.max().item())
-            indx_max = torch.argmax(dif)
-            print('dif',dif[indx_max])
-            print('hi_max' , hi[indx_max])
-            print('hj_max', hj[indx_max])
+        # if dif.max().item() >= 1:
+        #     print('dif max:', dif.max().item())
+        #     indx_max = torch.argmax(dif)
+        #     print('dif',dif[indx_max])
+        #     print('hi_max' , hi[indx_max])
+        #     print('hj_max', hj[indx_max])
         
         assert dif.max().item() <= 1, 'Max. difference is greater than 1 ' + str(dif.max().item())
         assert dif.min().item() >= -1, 'Min. difference is less than -1 ' + str(dif.min().item())

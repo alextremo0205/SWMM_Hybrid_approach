@@ -11,7 +11,7 @@ class InterchangeANN(nn.Module):
             nn.Linear(8, 4),
             nn.ReLU(),
             nn.Linear(4, 1),
-            nn.ReLU()
+            nn.Tanh()
         )
     def forward(self, x):
         

@@ -331,7 +331,7 @@ def tensor_heads_to_normalized_pd(tensor_heads, normalizer, name_nodes):
     return normalized_heads_pd
 
 
-def head_to_depth(head, normalizer, ref_window):
+def head_to_unnormalized_depth(head, normalizer, ref_window):
     return normalizer.unnormalize_heads(head-ref_window.norm_elev.reshape(-1))-normalizer.min_h
 
 # Plotting ---------------------------------------------------

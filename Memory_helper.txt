@@ -88,3 +88,10 @@ Apparently there is an error with the window creation. It is not sliding correct
 2022-06-27 08:52:47
 I could only give windows with changes 
 I could make the ANN to be uneven and symmetric. 
+
+
+2022-06-27 19:56:33
+Check for the flow conditionality
+Try different approaches for the link interchange
+    Make it symmetric
+Add more than one previous time step

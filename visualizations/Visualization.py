@@ -204,7 +204,7 @@ def get_bubble_trace(value, ref_window, colorscale, ref_marker_size=5):
     coordinates = ref_window.pos.numpy()
     x_coord = coordinates[:,0]
     y_coord = coordinates[:,1]
-
+    # print(ref_window['name_nodes'])
     if type(value)==torch.Tensor:
         value = value.numpy()
     
@@ -212,11 +212,11 @@ def get_bubble_trace(value, ref_window, colorscale, ref_marker_size=5):
     scatter_trace= go.Scatter(x=x_coord, y=y_coord,
                     mode='markers',
                     name='coordinates',
-                    hovertemplate = 'Value: %{text:.2f}<extra></extra>',
-                    text = value,
+                    hovertemplate = '%{text}', 
+                    text =  ['<b><br> Node ID: </b> {name} <br> <b>Value:</b> {value:.2f}'.format(name = node_names[i], value = value[i]) for i in range(len(node_names))],
                     marker_size=value-min(value),
                     marker=dict(color=value,showscale=True, sizeref=sizeref, sizemin = 2, colorscale=colorscale,  
-                                line=dict(width=2,color='DarkSlateGrey')),
+                                line=dict(width=1,color='DarkSlateGrey')),
                     
                     )
     return scatter_trace    

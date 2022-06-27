@@ -98,7 +98,7 @@ def extract_simulations_from_folders(simulations_path, inp_path, max_events=-1):
         heads_raw_data = get_heads_from_pickle(hydraulic_heads_path)
         runoff_raw_data = get_runoff_from_pickle(runoff_path)
         
-        sim = SWMMSimulation(G, heads_raw_data, runoff_raw_data)
+        sim = SWMMSimulation(G, heads_raw_data, runoff_raw_data, simulation)
         simulations.append(sim)
         
         if num_saved_events>=max_events:

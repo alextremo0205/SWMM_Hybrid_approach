@@ -8,7 +8,7 @@ from models.InterchangeANN import InterchangeANN
 
 class DynEm(MessagePassing):
     def __init__(self):
-        super().__init__(aggr='add')
+        super().__init__(aggr='add', flow = 'target_to_source')
         self.interchangeANN = InterchangeANN()
         self.runoffANN = RunoffANN()
         
@@ -65,20 +65,17 @@ class DynEm(MessagePassing):
         adjusted_elev_i = norm_elev_i + norm_out_offset
         adjusted_elev_j = norm_elev_j + norm_in_offset
         
-        hi_dry = torch.eq(hi, adjusted_elev_i)
-        hj_dry = torch.eq(hj, adjusted_elev_j)
+        hi_is_over_invert = torch.gt(hi, adjusted_elev_i)
+        hj_is_over_invert = torch.gt(hj, adjusted_elev_j)
         
-        flow_i_to_j = torch.ge(hi, hj)
-        flow_j_to_i = torch.ge(hj, hi)
+        should_flow_i_to_j = torch.ge(hi, hj)
+        should_flow_j_to_i = torch.ge(hj, hi)
         
-        node_i_should_flow_but_it_is_dry = torch.logical_and(hi_dry, flow_i_to_j) 
-        node_j_should_flow_but_it_is_dry = torch.logical_and(hj_dry, flow_j_to_i) 
+        node_i_will_flow = torch.logical_and(hi_is_over_invert, should_flow_i_to_j) 
+        node_j_will_flow = torch.logical_and(hj_is_over_invert, should_flow_j_to_i) 
         
-        mask_zeros = torch.logical_or(node_i_should_flow_but_it_is_dry, node_j_should_flow_but_it_is_dry)
-        mask_flows = torch.logical_not(mask_zeros)
-        
-        print('mask_flows', mask_flows)
-        
+        mask_flows = torch.logical_or(node_i_will_flow, node_j_will_flow)
+            
         return mask_flows
 
     

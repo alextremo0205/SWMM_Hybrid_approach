@@ -5,12 +5,13 @@ import pandas as pd
 from torch_geometric.utils import from_networkx
 
 class SWMMSimulation:
-    def __init__(self, G, heads_raw_data, runoff_raw_data):
+    def __init__(self, G, heads_raw_data, runoff_raw_data, name_simulation):
         
         self.G = G
         self.heads_raw_data = heads_raw_data
         self.runoff_raw_data = runoff_raw_data
         self.simulation_length = len(self.heads_raw_data)
+        self.name_simulation = name_simulation
         
     def get_all_windows(self, steps_ahead):
         assert steps_ahead>0, "The steps should be greater than 0"

@@ -86,14 +86,14 @@ class Normalizer:
         return window
     
     def add_in_offset_norm_features(self, window):
-        norm_in_offset = self.normalize_h_min_max(window['in_offset'])
+        norm_in_offset = self.scale_with_h_min_max(window['in_offset'])
         norm_in_offset = norm_in_offset.reshape(-1,1)
         window['norm_in_offset'] = norm_in_offset
         
         return window
    
     def add_out_offset_norm_features(self, window):
-        norm_out_offset = self.normalize_h_min_max(window['out_offset'])
+        norm_out_offset = self.scale_with_h_min_max(window['out_offset'])
         norm_out_offset = norm_out_offset.reshape(-1,1)
         window['norm_out_offset'] = norm_out_offset
         return window
@@ -115,6 +115,9 @@ class Normalizer:
     
     def normalize_h_min_max(self, original_h):
         return (original_h-self.min_h)/(self.max_h-self.min_h)
+    
+    def scale_with_h_min_max(self, relevant_distance):
+        return (relevant_distance)/(self.max_h-self.min_h)
     
     def normalize_runoff_min_max(self, original_runoff):
         return (original_runoff-self.min_runoff)/(self.max_runoff-self.min_runoff)

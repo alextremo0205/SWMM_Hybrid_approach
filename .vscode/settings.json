@@ -18,5 +18,16 @@
         "titleBar.inactiveBackground": "#2c2c2c99",
         "titleBar.inactiveForeground": "#e7e7e799"
     },
-    "peacock.color": "#2C2C2C"
+    "peacock.color": "#2C2C2C",
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./tests",
+        "-p",
+        "test_*.py"
+    ],
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestEnabled": true,
+    "python.linting.pylintEnabled": true,
+    "python.linting.enabled": false
 }

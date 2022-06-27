@@ -12,7 +12,7 @@ from sklearn.model_selection import train_test_split
 import plotly.graph_objects as go
 
 ## Utilities
-import utils.head_change_utils as utils
+import libraries.utils as utils
 
 # Open the file and load the file
 yaml_path = 'config_file.yaml'

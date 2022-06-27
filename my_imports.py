@@ -17,12 +17,10 @@ from torch_geometric.loader import DataLoader
 torch.set_printoptions(precision=4, sci_mode = False)
 
 ## Custom modules
-# import utils.DynamicEmulator as DE
 from models.GNNModel import GNNModel
-from utils.Normalizer import Normalizer
-from utils.trainingPyTorch import train
-from utils.SWMM_Simulation import SWMMSimulation
-import visualizations.Visualization as vis
+from libraries.Normalizer import Normalizer
+from libraries.trainingPyTorch import train
+from libraries.SWMM_Simulation import SWMMSimulation
+import visualization.Visualization as vis
 
-import utils.head_change_utils as utils
-# from models.mlp_q_interchange import QInterchangeNN, QRunoffNN
+import libraries.utils as utils

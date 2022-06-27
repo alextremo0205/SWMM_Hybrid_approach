@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import networkx as nx
-import utils.head_change_utils as utils
+import libraries.utils as utils
 
 
 def to_torch(object_to_convert):

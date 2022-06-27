@@ -31,26 +31,26 @@ class TestVisualization(unittest.TestCase):
     def test_dummy(self):
         self.assertEqual(0,0)
     
-    @unittest.skip
-    def test_get_scatter_from_dict(self):
-        scatter_loss     = vis.get_scatter_from_dict(self.history, 'Training loss')
-        scatter_val_loss = vis.get_scatter_from_dict(self.history, 'Validation loss')
+    # @unittest.skip
+    # def test_get_scatter_from_dict(self):
+    #     scatter_loss     = vis.get_scatter_from_dict(self.history, 'Training loss')
+    #     scatter_val_loss = vis.get_scatter_from_dict(self.history, 'Validation loss')
         
-        self.assertIsNotNone(scatter_loss)
-        self.assertIsNotNone(scatter_val_loss)
+    #     self.assertIsNotNone(scatter_loss)
+    #     self.assertIsNotNone(scatter_val_loss)
         
-        self.fig.add_trace(scatter_loss)
-        self.fig.add_trace(scatter_val_loss)
+    #     self.fig.add_trace(scatter_loss)
+    #     self.fig.add_trace(scatter_val_loss)
         
-        fig = vis.style_loss_fig(self.fig)
-        vis.show(fig)
+    #     fig = vis.style_loss_fig(self.fig)
+    #     vis.show(fig)
         
-    def test_plot_nodal_variable(self):
-        trace = vis.plot_nodal_variable()
-        self.assertIsNotNone(trace)
-        self.fig.add_trace(trace)
+    # def test_plot_nodal_variable(self):
+    #     trace = vis.plot_nodal_variable()
+    #     self.assertIsNotNone(trace)
+    #     self.fig.add_trace(trace)
         
-        vis.show(self.fig)
+    #     vis.show(self.fig)
         
         
 if __name__ == '__main__':

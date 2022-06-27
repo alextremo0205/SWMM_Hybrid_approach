@@ -36,22 +36,15 @@ class DynEm(MessagePassing):
         
         mask_flows = self.get_mask_flows(hi, hj, norm_elev_i, norm_elev_j, norm_in_offset, norm_out_offset)
 
-        dif = nn.Tanh()(hj-hi)
-
-        # if dif.max().item() >= 1:
-        #     print('dif max:', dif.max().item())
-        #     indx_max = torch.argmax(dif)
-        #     print('dif',dif[indx_max])
-        #     print('hi_max' , hi[indx_max])
-        #     print('hj_max', hj[indx_max])
+        dif = (hj-hi) #nn.Tanh()
         
-        assert dif.max().item() <= 1, 'Max. difference is greater than 1 ' + str(dif.max().item())
-        assert dif.min().item() >= -1, 'Min. difference is less than -1 ' + str(dif.min().item())
+        # assert dif.max().item() <= 1, 'Max. difference is greater than 1 ' + str(dif.max().item())
+        # assert dif.min().item() >= -1, 'Min. difference is less than -1 ' + str(dif.min().item())
         
         x_interchange = torch.concat((dif, norm_length, norm_geom_1, mask_flows), axis=1)
-        nn_interchange = self.interchangeANN(x_interchange)
+        result_nn_interchange = self.interchangeANN(x_interchange)
 
-        depth_interchange = torch.mul(nn_interchange, mask_flows)
+        depth_interchange = torch.mul(result_nn_interchange, mask_flows)
         
         return depth_interchange
 
@@ -69,20 +62,23 @@ class DynEm(MessagePassing):
     
     
     def get_mask_flows(self, hi, hj, norm_elev_i, norm_elev_j, norm_in_offset, norm_out_offset):
-        adjusted_hi = hi + norm_out_offset
-        adjusted_hj = hj + norm_in_offset
+        adjusted_elev_i = norm_elev_i + norm_out_offset
+        adjusted_elev_j = norm_elev_j + norm_in_offset
         
-        hi_dry = torch.eq(adjusted_hi, norm_elev_i)
-        hj_dry = torch.eq(adjusted_hj, norm_elev_j)
+        hi_dry = torch.eq(hi, adjusted_elev_i)
+        hj_dry = torch.eq(hj, adjusted_elev_j)
         
-        flow_i_to_j = torch.ge(adjusted_hi, adjusted_hj)
-        flow_j_to_i = torch.ge(adjusted_hj, adjusted_hi)
+        flow_i_to_j = torch.ge(hi, hj)
+        flow_j_to_i = torch.ge(hj, hi)
         
         node_i_should_flow_but_it_is_dry = torch.logical_and(hi_dry, flow_i_to_j) 
         node_j_should_flow_but_it_is_dry = torch.logical_and(hj_dry, flow_j_to_i) 
         
         mask_zeros = torch.logical_or(node_i_should_flow_but_it_is_dry, node_j_should_flow_but_it_is_dry)
         mask_flows = torch.logical_not(mask_zeros)
+        
+        print('mask_flows', mask_flows)
+        
         return mask_flows
 
     

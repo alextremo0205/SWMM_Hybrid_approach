@@ -83,3 +83,8 @@ Reduce the complexity of the auxiliary MLPs
 
 2022-06-24 10:38:04
 Apparently there is an error with the window creation. It is not sliding correctly.
+2022-06-27 08:51:54 Fixed, I reduced the maximum length so that it trims the sliding before it gets to the end and creates a smaller size window.
+
+2022-06-27 08:52:47
+I could only give windows with changes 
+I could make the ANN to be uneven and symmetric. 

@@ -35,7 +35,7 @@ class TestGNNModel(unittest.TestCase):
         self.assertIsInstance(self.GNN_model(self.trial_window), torch.Tensor)
     
     def test_GNN_layer_exists(self):
-        self.assertTrue(self.GNN_model.DynEM_layer != None)
+        self.assertTrue(self.GNN_model.DynEM_layer1 != None)
 
     def test_GNN_output_is_right_shape(self):
         output = self.GNN_model(self.trial_window)

@@ -95,3 +95,6 @@ Check for the flow conditionality
 Try different approaches for the link interchange
     Make it symmetric
 Add more than one previous time step
+
+2022-06-29 09:53:36
+Pickle the training windows for faster access

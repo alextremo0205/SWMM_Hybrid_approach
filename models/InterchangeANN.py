@@ -7,11 +7,11 @@ class InterchangeANN(nn.Module):
 
         self.linear_stack = nn.Sequential(
 
-            nn.Linear(in_dims, 8, bias = False),
+            nn.Linear(in_dims, 16 ),#   , bias = False),
             nn.ReLU(),
-            nn.Linear(8, 4, bias = False),
+            nn.Linear(16, 8       ),#   , bias = False),
             nn.ReLU(),
-            nn.Linear(4, out_dims, bias = False),
+            nn.Linear(8, out_dims ),#  , bias = False),
             
             nn.ReLU()
         )

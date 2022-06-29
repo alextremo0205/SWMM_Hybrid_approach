@@ -6,11 +6,11 @@ class NodeFeaturesANN(nn.Module):
         super(NodeFeaturesANN, self).__init__()
         
         self.linear_stack = nn.Sequential(
-            nn.Linear(in_dims, 16),
+            nn.Linear(in_dims, 16, ),# bias = False),
             nn.ReLU(),
-            nn.Linear(16, 8),
+            nn.Linear(16, 8,       ),# bias = False),
             nn.ReLU(),
-            nn.Linear(8, out_dims),
+            nn.Linear(8, out_dims, ),# bias = False),
             nn.ReLU()
         )
     def forward(self, x):

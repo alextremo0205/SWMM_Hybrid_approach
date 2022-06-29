@@ -6,12 +6,12 @@ class RunoffANN(nn.Module):
         super(RunoffANN, self).__init__()
         
         self.linear_stack = nn.Sequential(
-            nn.Linear(1, 8),
+            nn.Linear(1, 8, bias = False),
             nn.ReLU(),
-            nn.Linear(8, 4),
+            nn.Linear(8, 4, bias = False),
             nn.ReLU(),
-            nn.Linear(4, 1),
-            nn.Tanh()
+            nn.Linear(4, 1, bias = False),
+            nn.ReLU()
         )
     def forward(self, x):
         

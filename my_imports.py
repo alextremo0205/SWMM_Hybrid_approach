@@ -1,6 +1,7 @@
 # Imports
 import os
-import random as rd
+import pickle
+import random
 import importlib
 import numpy as np
 import pandas as pd

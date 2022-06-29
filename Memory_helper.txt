@@ -64,7 +64,7 @@ For some reason, it is returning a number 2 in the mask values.
 Validation!!
 Program the unrolling
 How good is the model working?
-Visualize in equal terms 
+Visualize in equal terms
 Control + Z to the parameters
 
 2022-06-23 10:44:52
@@ -86,8 +86,8 @@ Apparently there is an error with the window creation. It is not sliding correct
 2022-06-27 08:51:54 Fixed, I reduced the maximum length so that it trims the sliding before it gets to the end and creates a smaller size window.
 
 2022-06-27 08:52:47
-I could only give windows with changes 
-I could make the ANN to be uneven and symmetric. 
+I could only give windows with changes
+I could make the ANN to be uneven and symmetric.
 
 
 2022-06-27 19:56:33
@@ -96,5 +96,5 @@ Try different approaches for the link interchange
     Make it symmetric
 Add more than one previous time step
 
-2022-06-29 08:25:56
-I had the best results so far but I realized I was not doing the unrolling as it should be. 
+2022-06-29 09:53:36
+Pickle the training windows for faster access

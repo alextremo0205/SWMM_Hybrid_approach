@@ -31,21 +31,9 @@ class DynEm(MessagePassing):
     
     def message(self, x_i, x_j, norm_elev_i, norm_elev_j, norm_length, norm_geom_1, norm_in_offset, norm_out_offset):
         
-        # hi = x_i[:, 0].reshape(-1,1)
-        # hj = x_j[:, 0].reshape(-1,1)
-        
-        # mask_flows = self.get_mask_flows(hi, hj, norm_elev_i, norm_elev_j, norm_in_offset, norm_out_offset)
-
-        # dif = (hj-hi) #nn.Tanh()
-        
-        # assert dif.max().item() <= 1, 'Max. difference is greater than 1 ' + str(dif.max().item())
-        # assert dif.min().item() >= -1, 'Min. difference is less than -1 ' + str(dif.min().item())
-        
         x_interchange = torch.concat((x_i, x_j, norm_length, norm_geom_1), axis=1)
         result_nn_interchange = self.interchangeANN(x_interchange)
-        
-        # depth_interchange = torch.mul(result_nn_interchange, mask_flows)
-        
+                
         return result_nn_interchange
 
     
@@ -76,7 +64,7 @@ class DynEm(MessagePassing):
         node_j_will_flow = torch.logical_and(hj_is_over_invert, should_flow_j_to_i) 
         
         mask_flows = torch.logical_or(node_i_will_flow, node_j_will_flow)
-            
+        
         return mask_flows
 
     

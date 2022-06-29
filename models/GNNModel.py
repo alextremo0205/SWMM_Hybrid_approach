@@ -44,13 +44,15 @@ class GNNModel(torch.nn.Module):
                                 norm_out_offset
                                 )
             
+            
             pred[:, step] = y.reshape(-1)
+            
             
             new_runoff = d.x[:, 2:]
             new_x = torch.cat((y, new_runoff), dim = 1)
             d['x'] = new_x
-            # print('new_x', new_x)
-            # print('new_x.shape', new_x.shape)
+
+
         return pred
 
     def __repr__(self) -> str:

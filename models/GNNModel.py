@@ -22,12 +22,13 @@ class GNNModel(torch.nn.Module):
         
         pred = torch.zeros(num_nodes, steps_ahead)
         for step in range(steps_ahead):
-            x = d.x
-            new_h = self.DynEM_layer(edge_index, x, norm_elev, norm_length, norm_geom_1, norm_in_offset, norm_out_offset)
+            one_step_x = d.x[:,:2]
+            new_h = self.DynEM_layer(edge_index, one_step_x, norm_elev, norm_length, norm_geom_1, norm_in_offset, norm_out_offset)
             pred[:, step] = new_h.reshape(-1)
-            new_runoff = x[:, 2:]
+            new_runoff = d.x[:, 2:]
             new_x = torch.cat((new_h, new_runoff), dim = 1)
             d['x'] = new_x
+            print('new_x.shape', new_x.shape)
         return pred
     
     def __repr__(self) -> str:

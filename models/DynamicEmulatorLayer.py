@@ -41,7 +41,7 @@ class DynEm(MessagePassing):
         # assert dif.max().item() <= 1, 'Max. difference is greater than 1 ' + str(dif.max().item())
         # assert dif.min().item() >= -1, 'Min. difference is less than -1 ' + str(dif.min().item())
         
-        x_interchange = torch.concat((dif, norm_length, norm_geom_1, mask_flows), axis=1)
+        x_interchange = torch.concat((hi, hj, norm_length, norm_geom_1), axis=1)
         result_nn_interchange = self.interchangeANN(x_interchange)
 
         depth_interchange = torch.mul(result_nn_interchange, mask_flows)

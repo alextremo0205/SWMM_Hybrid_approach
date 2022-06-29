@@ -95,3 +95,6 @@ Check for the flow conditionality
 Try different approaches for the link interchange
     Make it symmetric
 Add more than one previous time step
+
+2022-06-29 08:25:56
+I had the best results so far but I realized I was not doing the unrolling as it should be. 

@@ -64,7 +64,7 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
     
         # Early stopping
         current_loss = val_loss
-        if abs(current_loss - last_loss) < 1e-4:
+        if abs(current_loss - last_loss) < 1e-4 or current_loss>last_loss:
             trigger_times += 1
             
             if trigger_times >= patience:

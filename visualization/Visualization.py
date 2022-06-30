@@ -215,7 +215,7 @@ def get_bubble_trace(value, ref_window, colorscale, ref_marker_size=5):
                     hovertemplate = '%{text}', 
                     text =  ['<b><br> Node ID: </b> {name} <br> <b>Value:</b> {value:.2f}'.format(name = node_names[i], value = value[i]) for i in range(len(node_names))],
                     marker_size=value-min(value),
-                    marker=dict(color=value,showscale=True, sizeref=sizeref, sizemin = 2, colorscale=colorscale,  
+                    marker=dict(color=value,showscale=True, sizeref=sizeref, sizemin = 2, colorscale=colorscale, cmax=1, cmin =0, 
                                 line=dict(width=1,color='DarkSlateGrey')),
                     
                     )

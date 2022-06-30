@@ -98,3 +98,35 @@ Add more than one previous time step
 
 2022-06-29 09:53:36
 Pickle the training windows for faster access
+
+2022-06-30 09:48:53
+Add roughness? Geom_2?
+
+Based on conversation with Roberto:
+    - Put multiple steps behind -> Priority
+    - Early stopping is a must (Implemented)
+    - Saving the model with the best validation error (Coded)
+    - Validation should be on the entire events (Implemented)
+    
+    - Possible weighted loss for time steps ahead
+
+
+Try concatenating instead of adding
+
+Add alpha*inputs
+Add matrices that multiply the sum of message passing and the MLP of (h and runoff) (This option is the preference by Roberto)
+Or add MLP of concatenated (ht, inputs)
+
+
+Based on conversation with Job and João. 
+I could post-process the heads so that they are above ground. Not in the training so that the loss function does not pick up on that. 
+I could also include DWF so that the network sees constant inflow.
+
+
+Based on conversation with Riccardo: 
+Check residual connections as done by Xing and Sela
+Double check the temporality
+Check if the model works without considering the xi and xj at the pipes. Or maybe with the difference of them.
+Is there a way to include the flows? Predict them? Or in the loss function?
+
+

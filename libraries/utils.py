@@ -94,14 +94,17 @@ def extract_simulations_from_folders(simulations_path, inp_path, max_events=-1):
     simulations =[]
     
     num_saved_events = 0
-    for simulation in list_of_simulations:
-        hydraulic_heads_path = '\\'.join([simulations_path,simulation,'hydraulic_head.pk'])
-        runoff_path = '\\'.join([simulations_path,simulation,'runoff.pk'])
+    for name_simulation in list_of_simulations:
+        hydraulic_heads_path = '\\'.join([simulations_path,name_simulation,'hydraulic_head.pk'])
+        runoff_path = '\\'.join([simulations_path,name_simulation,'runoff.pk'])
+        rain_path = '\\'.join([simulations_path,name_simulation, name_simulation+'.dat'])
         
         heads_raw_data = get_heads_from_pickle(hydraulic_heads_path)
         runoff_raw_data = get_runoff_from_pickle(runoff_path)
         
-        sim = SWMMSimulation(G, heads_raw_data, runoff_raw_data, simulation)
+        rain_raw_data = get_rain_in_pandas(rain_path)
+        
+        sim = SWMMSimulation(G, heads_raw_data, runoff_raw_data, rain_raw_data, name_simulation)
         simulations.append(sim)
         
         if num_saved_events>=max_events:
@@ -320,7 +323,6 @@ def count_parameters(model):
 def head_to_unnormalized_depth(head, normalizer, ref_window):
     return normalizer.unnormalize_heads(head-ref_window.norm_elev.reshape(-1))-normalizer.min_h
 
-    
 def get_all_windows_from_list_simulations(simulations, steps_ahead):
     windows = []
     for sim in simulations:

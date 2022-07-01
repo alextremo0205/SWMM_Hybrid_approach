@@ -20,7 +20,6 @@ class Normalizer:
         
         self.name_nodes = training_windows[0].name_nodes
         
-                
     def get_min_h(self):
         extreme_min_h_x = self.use_function_get_value(torch.min, 'h_x')
         extreme_min_h_y = self.use_function_get_value(torch.min, 'h_y')

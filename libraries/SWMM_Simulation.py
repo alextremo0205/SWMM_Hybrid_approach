@@ -11,6 +11,10 @@ class SWMMSimulation:
         self.simulation_length  = len(self.heads_raw_data)
         self.name_simulation    = name_simulation
         
+    def get_simulation_in_one_window(self):
+        one_window = self.get_all_windows(steps_ahead = self.simulation_length - 2)[0]
+        return one_window
+        
     def get_all_windows(self, steps_ahead):
         assert steps_ahead>0, "The steps should be greater than 0"
         max_time_allowed = (self.simulation_length - steps_ahead) - 1

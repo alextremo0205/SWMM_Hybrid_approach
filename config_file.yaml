@@ -7,8 +7,8 @@ zero_cases_simulations_path : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3
 
 inp_path: 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\networks\Tuindorp_Right_Part.inp',
 
-training_windows_path   : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\pickles\training_windows_50_events_4_steps.pk',
-validation_windows_path : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\pickles\validation_windows_5_events_4_steps.pk',
+training_windows_path   : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\saved_objects\training_windows_50_events_4_steps.pk',
+validation_windows_path : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\saved_objects\validation_windows_5_events_4_steps.pk',
 
 use_saved_training_windows  : true,
 use_saved_validation_windows: true,
@@ -18,7 +18,4 @@ num_events_validation  : 28,
 steps_ahead            : 4,
 steps_behind           : 0,
 epochs                 : 10,
-
-
-
 }

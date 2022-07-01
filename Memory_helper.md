@@ -129,4 +129,8 @@ Double check the temporality
 Check if the model works without considering the xi and xj at the pipes. Or maybe with the difference of them.
 Is there a way to include the flows? Predict them? Or in the loss function?
 
+# Outline
 
+2022-07-01 10:07:01
+Distinguish between outfalls and junctions with one hot vector
+Presenter class

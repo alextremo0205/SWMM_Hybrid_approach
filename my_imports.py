@@ -8,7 +8,6 @@ import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 
-from pygit2 import Repository
 from ipywidgets import FloatProgress
 from sklearn.model_selection import train_test_split
 
@@ -28,3 +27,6 @@ from libraries.SWMM_Simulation import SWMMSimulation
 import visualization.Visualization as vis
 
 import libraries.utils as utils
+
+
+utils.print_current_git_branch()

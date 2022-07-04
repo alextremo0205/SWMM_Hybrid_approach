@@ -14,7 +14,7 @@ class SWMMSimulationTest(unittest.TestCase):
         cls.yaml_data = utils.load_yaml(yaml_path)
         
         inp_path = cls.yaml_data['inp_path']
-        simulations_path = cls.yaml_data['simulations_path']
+        simulations_path = cls.yaml_data['training_simulations_path']
         
         simulations = utils.extract_simulations_from_folders(simulations_path, inp_path, max_events = 5)
 

@@ -46,7 +46,7 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
         # --- EVALUATE ON VALIDATION SET -------------------------------------
         model.eval()
         val_loss       = 0.0
-
+        
         for batch in val_dl:
 
             x    = batch.to(device)

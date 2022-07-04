@@ -39,6 +39,7 @@ class DynEm(MessagePassing):
         
         new_var = self.nodeFeaturesANN(x)
         candidate_h = new_var + inputs
+        
         # print('Dims of self.nodeFeaturesANN(x): ', candidate_h.shape)
         # new_h = torch.max(candidate_h, norm_elev)
                
@@ -65,7 +66,7 @@ class DynEm(MessagePassing):
 
     
     def __repr__(self) -> str:
-        return (f'{self.__class__.__name__}({self.interchangeANN}, aggr={self.aggr}')
+        return (f'{self.__class__.__name__}(Interchange ANN = {self.interchangeANN}, NodeFeatures ANN = {self.nodeFeaturesANN}, aggr={self.aggr}')
                 
 
 

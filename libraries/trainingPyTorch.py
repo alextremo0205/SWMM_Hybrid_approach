@@ -43,10 +43,11 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
         scheduler.step()
         train_loss  = train_loss / len(train_dl.dataset)
 
+        print('finished training batches, now validation batches')
         # --- EVALUATE ON VALIDATION SET -------------------------------------
         model.eval()
         val_loss       = 0.0
-
+        
         for batch in val_dl:
 
             x    = batch.to(device)

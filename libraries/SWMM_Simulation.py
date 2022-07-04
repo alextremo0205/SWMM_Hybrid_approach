@@ -13,7 +13,7 @@ class SWMMSimulation:
         self.rain_raw_data      = rain_raw_data
         
     def get_simulation_in_one_window(self, steps_behind):
-        safety_margin = 2
+        safety_margin = 2+steps_behind
         one_window = self.get_all_windows(steps_ahead = self.simulation_length - safety_margin, steps_behind = steps_behind)[0]
         return one_window
         
@@ -21,7 +21,7 @@ class SWMMSimulation:
         assert steps_ahead>0, "The steps ahead should be greater than 0"
         assert steps_behind>0, "The steps behind should be greater than 0"
         
-        length_window = steps_ahead +steps_behind
+        length_window = steps_ahead + steps_behind
         
         max_time_allowed = (self.simulation_length - (length_window))
         windows_list = []

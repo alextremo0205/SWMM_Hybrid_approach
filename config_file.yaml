@@ -7,16 +7,16 @@ zero_cases_simulations_path : 'data\simulations\zero cases',
 
 inp_path:                     'data\networks\Tuindorp_Right_Part.inp',
 
-training_windows_path   :     'saved_objects\training_windows_20_events_4_steps.pk',
+training_windows_path   :     'saved_objects/training_windows_20_events_1_1_steps.pk',
 validation_windows_path :     'saved_objects\validation_windows_5_events_4_steps.pk',
 
 use_saved_training_windows  : false,
 use_saved_validation_windows: false,
 
-num_events_training    : 2,
-num_events_validation  : 2,
-steps_ahead            : 4,
-steps_behind           : 2,
+num_events_training    : 20,
+num_events_validation  : 5,
+steps_ahead            : 10,
+steps_behind           : 1,
 epochs                 : 10,
 
 }

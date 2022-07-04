@@ -9,11 +9,13 @@ from models.GNNModel import GNNModel
 class TestGNNModel(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        yaml_path = 'config_file.yaml'
-        cls.yaml_data = utils.load_yaml(yaml_path)
+        yaml_path           = 'config_file.yaml'
+        cls.yaml_data       = utils.load_yaml(yaml_path)
+        inp_path            = cls.yaml_data['inp_path']
+        simulations_path    = cls.yaml_data['training_simulations_path']
+        steps_ahead         = 1 #cls.yaml_data['steps_ahead']
+        steps_behind        = 1 #cls.yaml_data['steps_behind'] 
         
-        inp_path = cls.yaml_data['inp_path']
-        simulations_path = cls.yaml_data['training_simulations_path']
         
         simulations = utils.extract_simulations_from_folders(simulations_path, 
                                                              inp_path, 
@@ -22,11 +24,11 @@ class TestGNNModel(unittest.TestCase):
         events_to_train = [0,1]
         for event in events_to_train:
             sim = simulations[event]
-            training_windows += sim.get_all_windows(steps_ahead = 2)
+            training_windows += sim.get_all_windows(steps_ahead, steps_behind)
         
         cls.normalizer = Normalizer(training_windows)
         cls.trial_window = cls.normalizer.get_list_normalized_training_windows()[0]
-        cls.GNN_model = GNNModel()
+        cls.GNN_model = GNNModel(steps_ahead, steps_behind)
     
     def test_GNN_model_is_valid(self):
         self.assertTrue(self.GNN_model!=None)
@@ -36,8 +38,10 @@ class TestGNNModel(unittest.TestCase):
     
     def test_GNN_layer_exists(self):
         self.assertTrue(self.GNN_model.DynEM_layer1 != None)
-
+        
     def test_GNN_output_is_right_shape(self):
+        print(self.trial_window)
+        
         output = self.GNN_model(self.trial_window)
         num_nodes = self.trial_window.num_nodes
         num_timesteps = self.trial_window['steps_ahead']

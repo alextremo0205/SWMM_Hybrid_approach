@@ -21,10 +21,11 @@ torch.set_printoptions(precision=4, sci_mode = False)
 
 ## Custom modules
 from models.GNNModel import GNNModel
+import visualization.Visualization as vis
 from libraries.Normalizer import Normalizer
 from libraries.trainingPyTorch import train
 from libraries.SWMM_Simulation import SWMMSimulation
-import visualization.Visualization as vis
+
 
 import libraries.utils as utils
 

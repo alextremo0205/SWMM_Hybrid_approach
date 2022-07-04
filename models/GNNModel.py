@@ -34,11 +34,16 @@ class GNNModel(torch.nn.Module):
         num_nodes       = d.num_nodes
         
         pred = torch.zeros(num_nodes, length_simulation)        
-
+        # print('pred.shape', pred.shape)
+        # print('self.steps_behind', self.steps_behind)
+        # print('self.steps_ahead', self.steps_ahead)
+        
+        
         for step in range(0,length_simulation, self.steps_ahead):
-            
-            runoff_step = runoff[:, step:step+2*self.steps_ahead]
+            runoff_step = runoff[:, step:step+self.steps_ahead+self.steps_behind]
+            # print('runoff_step.shape', runoff_step.shape)
             one_step_x = torch.cat((h0, runoff_step), dim = 1)
+            # print('one_step_x.shape',one_step_x.shape)
             out_mp = self.DynEM_layer1(edge_index,
                                 one_step_x,
                                 norm_elev,
@@ -66,7 +71,7 @@ class GNNModel(torch.nn.Module):
         original_size = h0.shape[1]
         concatenated = torch.cat((h0, y), dim =1)
         new_h0 = concatenated[:, -original_size:]
-        
+        # print(new_h0.shape)
         return new_h0
         
     

@@ -12,34 +12,40 @@ class SWMMSimulation:
         self.name_simulation    = name_simulation
         self.rain_raw_data      = rain_raw_data
         
-    def get_simulation_in_one_window(self):
-        one_window = self.get_all_windows(steps_ahead = self.simulation_length - 2)[0]
+    def get_simulation_in_one_window(self, steps_behind):
+        safety_margin = 2
+        one_window = self.get_all_windows(steps_ahead = self.simulation_length - safety_margin, steps_behind = steps_behind)[0]
         return one_window
         
-    def get_all_windows(self, steps_ahead):
-        assert steps_ahead>0, "The steps should be greater than 0"
-        max_time_allowed = (self.simulation_length - steps_ahead) - 1
-        windows_list = []
+    def get_all_windows(self, steps_ahead, steps_behind):
+        assert steps_ahead>0, "The steps ahead should be greater than 0"
+        assert steps_behind>0, "The steps behind should be greater than 0"
         
-        for time in range(0, max_time_allowed, steps_ahead):
-            window = self.get_window(steps_ahead, time)
+        length_window = steps_ahead +steps_behind
+        
+        max_time_allowed = (self.simulation_length - (length_window))
+        windows_list = []
+
+        for time in range(steps_behind, max_time_allowed, length_window):
+            window = self.get_window(steps_ahead, steps_behind, time)
             windows_list.append(window)
 
         return windows_list
     
-    def get_window(self, steps_ahead, time):
+    def get_window(self, steps_ahead, steps_behind, time):
         
         self.checkOutOfBounds(steps_ahead, time)
         
-        h0 =                self.get_h0_for_window(time)
-        ro_timeperiod =     self.get_ro_for_window(time, steps_ahead)
+        h0 =                self.get_h0_for_window(time, steps_behind)
+        ro_timeperiod =     self.get_ro_for_window(time, steps_ahead, steps_behind)
         ht_timeperiod =     self.get_ht_for_window(time, steps_ahead)
         
-        h_x_dict=    self.get_features_dictionary(h0)
-        ro_x_dict =  self.get_features_dictionary(ro_timeperiod)
-        output_features_dict=   self.get_features_dictionary(ht_timeperiod)
+        h_x_dict            =  self.get_features_dictionary(h0)
+        ro_x_dict           =  self.get_features_dictionary(ro_timeperiod)
+        output_features_dict=  self.get_features_dictionary(ht_timeperiod)
         
         G_for_window =      self.G
+        
         nx.set_node_attributes(G_for_window, h_x_dict, name = 'h_x')
         nx.set_node_attributes(G_for_window, ro_x_dict, name ='runoff')
         nx.set_node_attributes(G_for_window, output_features_dict,name = 'h_y')
@@ -47,6 +53,7 @@ class SWMMSimulation:
         window = from_networkx(G_for_window)
 
         window['steps_ahead'] = steps_ahead
+        window['steps_behind'] = steps_behind
         
         return window
 
@@ -55,13 +62,16 @@ class SWMMSimulation:
         if time>max_allowable_time:
             raise ValueError("The window is beyond the time series length")
 
-    def get_h0_for_window(self, time):
-        return pd.DataFrame(self.heads_raw_data.iloc[time, :]).transpose()
-    def get_ro_for_window(self, time, steps_ahead):
-        return self.runoff_raw_data.iloc[time:time+steps_ahead,:]
+    def get_h0_for_window(self, time, steps_behind):
+        lagged_time = time-steps_behind
+        return self.heads_raw_data.iloc[lagged_time:time, :]
+    
+    def get_ro_for_window(self, time, steps_ahead, steps_behind):
+        lagged_time = time-steps_behind
+        return self.runoff_raw_data.iloc[lagged_time:time+steps_ahead,:]
 
     def get_ht_for_window(self, time, steps_ahead):
-        return self.heads_raw_data.iloc[time+1:time+steps_ahead+1,:]
+        return self.heads_raw_data.iloc[time:time+steps_ahead,:]
 
     def get_features_dictionary(self, *args):
         features_df         = pd.concat(args).reset_index(drop =True).transpose()  

@@ -323,10 +323,10 @@ def count_parameters(model):
 def head_to_unnormalized_depth(head, normalizer, ref_window):
     return normalizer.unnormalize_heads(head-ref_window.norm_elev.reshape(-1))-normalizer.min_h
 
-def get_all_windows_from_list_simulations(simulations, steps_ahead):
+def get_all_windows_from_list_simulations(simulations, steps_ahead, steps_behind):
     windows = []
     for sim in simulations:
-        windows += sim.get_all_windows(steps_ahead = steps_ahead)
+        windows += sim.get_all_windows(steps_ahead = steps_ahead, steps_behind = steps_behind)
     return windows
 
 def load_windows(windows_path):

@@ -1,22 +1,26 @@
-
-import networkx as nx
 import pandas as pd
-
+import networkx as nx
 from torch_geometric.utils import from_networkx
 
 class SWMMSimulation:
-    def __init__(self, G, heads_raw_data, runoff_raw_data, name_simulation):
+    def __init__(self, G, heads_raw_data, runoff_raw_data, rain_raw_data, name_simulation):
         
-        self.G = G
-        self.heads_raw_data = heads_raw_data
-        self.runoff_raw_data = runoff_raw_data
-        self.simulation_length = len(self.heads_raw_data)
-        self.name_simulation = name_simulation
+        self.G                  = G
+        self.heads_raw_data     = heads_raw_data
+        self.runoff_raw_data    = runoff_raw_data
+        self.simulation_length  = len(self.heads_raw_data)
+        self.name_simulation    = name_simulation
+        self.rain_raw_data      = rain_raw_data
+        
+    def get_simulation_in_one_window(self):
+        one_window = self.get_all_windows(steps_ahead = self.simulation_length - 2)[0]
+        return one_window
         
     def get_all_windows(self, steps_ahead):
         assert steps_ahead>0, "The steps should be greater than 0"
         max_time_allowed = (self.simulation_length - steps_ahead) - 1
         windows_list = []
+        
         for time in range(0, max_time_allowed, steps_ahead):
             window = self.get_window(steps_ahead, time)
             windows_list.append(window)
@@ -60,12 +64,13 @@ class SWMMSimulation:
         return self.heads_raw_data.iloc[time+1:time+steps_ahead+1,:]
 
     def get_features_dictionary(self, *args):
-        features_df = pd.concat(args).reset_index(drop =True).transpose()  
-        node_names =        list(features_df.index)
-        list_features =     features_df.values.tolist()
-        input_features_dict=dict(zip(node_names, list_features))
+        features_df         = pd.concat(args).reset_index(drop =True).transpose()  
+        node_names          = list(features_df.index)
+        list_features       = features_df.values.tolist()
+        input_features_dict = dict(zip(node_names, list_features))
+        
         return input_features_dict
 
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}()'
+        return f'{self.__class__.__name__}({self.name_simulation})'

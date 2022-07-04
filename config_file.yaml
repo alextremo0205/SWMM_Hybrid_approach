@@ -1,13 +1,21 @@
-# Hydralic head configuration file
 {
-
-# networks names
-training_simulations_path : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\training',
+training_simulations_path :   'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\training',
 validation_simulations_path : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\validation',
-testing_simulations_path : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\testing',
+testing_simulations_path :    'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\testing',
 
 zero_cases_simulations_path : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\zero cases',
 
-inp_path: 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\networks\Tuindorp_Right_Part.inp',
+inp_path:                     'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\networks\Tuindorp_Right_Part.inp',
 
+training_windows_path   :     'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\saved_objects\training_windows_50_events_4_steps.pk',
+validation_windows_path :     'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\saved_objects\validation_windows_5_events_4_steps.pk',
+
+use_saved_training_windows  : true,
+use_saved_validation_windows: false,
+
+num_events_training    : 50,
+num_events_validation  : 28,
+steps_ahead            : 4,
+steps_behind           : 0,
+epochs                 : 10,
 }

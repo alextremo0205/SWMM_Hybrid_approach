@@ -6,13 +6,35 @@ import torch
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
+from plotly.subplots import make_subplots
 
 
+def plot_heads_timeseries(swmm_heads_pd, predicted_heads_pd, runoff_pd, node):
+
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    
+    scatter_swmm = get_scatter(swmm_heads_pd, node, 'SWMM')
+    scatter_pred = get_scatter(predicted_heads_pd, node, 'GNN')
+    bar_runoff   = get_barplot(runoff_pd, node, 'Runoff')
+    
+    
+    fig.add_trace(bar_runoff,   secondary_y=True)
+    
+    fig.add_trace(scatter_swmm, secondary_y=False)
+    fig.add_trace(scatter_pred, secondary_y=False)
+    # fig.update_yaxes(autorange="reversed",  secondary_y=True)
+    fig.update_yaxes(range=[0.02,  0],  secondary_y=True)
+    
+    fig = style_heads_fig(fig, node)
+    
+    fig.show()
+
+    
 def plot_loss(history):
     fig = go.Figure()
     
-    scatter_loss     = get_scatter_from_dict(history, 'Training loss')
-    scatter_val_loss = get_scatter_from_dict(history, 'Validation loss')
+    scatter_loss     = get_scatter(history, 'Training loss')
+    scatter_val_loss = get_scatter(history, 'Validation loss')
     
     fig.add_trace(scatter_loss)
     fig.add_trace(scatter_val_loss)
@@ -20,24 +42,47 @@ def plot_loss(history):
     fig = style_loss_fig(fig)
     
     fig.show()
-
-def get_scatter_from_dict(history, field):
-    df = pd.DataFrame(history)
+    
+def get_scatter(df, field, name = None):
+    
+    df = df.round(2)
+    
+    if name == None:
+        name = field
+    
+    if type(df) == dict:
+        df = pd.DataFrame(df)
     
     scatter_trace = go.Scatter(x = df.index.values, 
                                y = df[field], 
                                
-                               name = field,
+                               name = name,
                                mode = "lines+markers",
 
                                line = dict(width = 3),
-                               marker=dict(size = 12),
+                               marker=dict(size = 8),
                                
                                )
     
     
     return scatter_trace
    
+
+def get_barplot(df, node, name):
+    df = pd.DataFrame(df[node].reset_index(drop = True)).round(2)
+
+    if name == None:
+        name = node
+
+    bar_trace = go.Bar( x = df.index.values, 
+                        y = df[node], 
+                        # name = name,
+                        # mode = "lines+markers",
+                        # line = dict(width = 3),
+                        # marker=dict(size = 8),
+                        )
+    return bar_trace
+
 def style_loss_fig(fig):
     margin = 80
     
@@ -51,11 +96,32 @@ def style_loss_fig(fig):
         yaxis_title ="MSE Loss",
         legend_title="Legend",
         
-        font=dict(family="Times new Roman", size=28, color="Black"),
+        # font=dict(family="Times new Roman", size=28, color="Black"),
+        template = custom_template, 
 
     )
 
     return fig
+
+def style_heads_fig(fig, node):
+    margin = 80
+    
+    fig.update_layout(
+        width=900,
+        height=600,
+        margin=dict(l=margin, r=margin, t=margin, b=margin),
+        
+        title       ="Head timeseries at node " + node,
+        xaxis_title ="Time steps (5 min)",
+        yaxis_title ="Head (MSL)",
+        legend_title="Legend",
+        
+        template = custom_template, 
+
+    )
+
+    return fig
+
 
 def show(fig):
 
@@ -63,33 +129,6 @@ def show(fig):
     pio.write_image(fig, buf)
     img = Image.open(buf)
     img.show() 
-
-
-
-
-# def get_depths_to_rows(self,timestep):
-    # rows = [[timestep, node, (depth - self.original_min[node]).item(), self.pos[node][0], self.pos[node][1]] for node, depth in self.h.items()]
-#     return rows
-
-columns = ['Time' , 'Node', 'Depth', 'x_coord' , 'y_coord']
-
-# df = pd.DataFrame(wn.get_depths_to_rows(0), columns = columns)
-
-# for time in range(1):
-#     wn.update_h(runoff = X_train[0][2][time]) 
-#     new_h_rows = pd.DataFrame(wn.get_depths_to_rows(time+1), columns = columns)
-#     df = pd.concat([df,new_h_rows])
-
-
-# depth_one_node = df[df['Node']=='j_90376']['Depth'] #.plot() j_90550
-# depth_one_node=depth_one_node.reset_index()
-# depth_one_node['Depth'].plot()
-
-
-# net = utils.animate_nodal_depth(df)
-
-
-
 
 def animate_nodal_depth(df):
     net = px.scatter(
@@ -108,18 +147,13 @@ def animate_nodal_depth(df):
 
 def plot_nodal_variable(value, ref_window, name_value, colorscale='PuBu', ref_marker_size = 5):
     
-    
     num_steps = value.shape[1]
-    dt = 5
     
-    # make figure
     fig_dict = {
         "data": [],
         "layout": {},
         "frames": []
     }
-    
-    
     
     fig_dict["layout"]["updatemenus"] = [
     {
@@ -175,7 +209,6 @@ def plot_nodal_variable(value, ref_window, name_value, colorscale='PuBu', ref_ma
             )
                                   )
         
-
         slider_step = {"args": [
             [time_step],
             {"frame": {"duration": 300, "redraw": False},
@@ -193,7 +226,6 @@ def plot_nodal_variable(value, ref_window, name_value, colorscale='PuBu', ref_ma
     
     fig = go.Figure(data =data, layout = fig_dict['layout'], frames = fig_dict["frames"])
     
-    
     fig = style_bubble_fig(fig, name_value)
     fig.show()
     
@@ -204,7 +236,7 @@ def get_bubble_trace(value, ref_window, colorscale, ref_marker_size=5):
     coordinates = ref_window.pos.numpy()
     x_coord = coordinates[:,0]
     y_coord = coordinates[:,1]
-    # print(ref_window['name_nodes'])
+
     if type(value)==torch.Tensor:
         value = value.numpy()
     
@@ -217,36 +249,49 @@ def get_bubble_trace(value, ref_window, colorscale, ref_marker_size=5):
                     marker_size=value-min(value),
                     marker=dict(color=value,showscale=True, sizeref=sizeref, sizemin = 2, colorscale=colorscale, cmax=1, cmin =0, 
                                 line=dict(width=1,color='DarkSlateGrey')),
-                    
                     )
     return scatter_trace    
     
 
 def style_bubble_fig(fig, name_value):
-    margin = 80
-    
     fig.update_layout(
         width=500,
         height=800,
-        # margin=dict(l=margin, r=margin, t=margin, b=margin),
-        
         title       ="Spatial distribution of "+ name_value, 
-        # xaxis_title ="Epochs",
-        # yaxis_title ="MSE Loss",
         legend_title="Legend",
         xaxis = dict(visible=False),
         yaxis = dict(visible=False),
-        
         font=dict(family="Times new Roman", size=18, color="Black"),
-        # updatemenus=[dict(
-        #     type="buttons",
-        #     buttons=[dict(label="Play2",
-        #                   method="animate",
-        #                   args=[None])])]
-        
-        
-
-
     )
-
     return fig
+
+
+
+custom_template = {
+    "layout": go.Layout(
+        font={
+            "family": "Nunito",
+            "size": 16,
+            "color": "#707070",
+        },
+        title={
+            "font": {
+                "family": "Lato",
+                "size": 22,
+                "color": "#1f1f1f",
+            },
+        },
+        xaxis={
+            "showspikes":   True,
+            "spikemode":    'across',
+            "spikesnap":    'cursor',
+            "showline":     True,
+            "showgrid":     True,
+        },
+        hovermode  = 'x',
+        plot_bgcolor="#ffffff",
+        paper_bgcolor="#ffffff",
+        colorway=px.colors.qualitative.G10,
+    )
+}
+

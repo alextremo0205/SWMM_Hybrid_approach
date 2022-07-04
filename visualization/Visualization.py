@@ -23,7 +23,7 @@ def plot_heads_timeseries(swmm_heads_pd, predicted_heads_pd, runoff_pd, node):
     fig.add_trace(scatter_swmm, secondary_y=False)
     fig.add_trace(scatter_pred, secondary_y=False)
     # fig.update_yaxes(autorange="reversed",  secondary_y=True)
-    fig.update_yaxes(range=[0.02,  0],  secondary_y=True)
+    fig.update_yaxes(range=[0.03,  0],  secondary_y=True)
     
     fig = style_heads_fig(fig, node)
     
@@ -44,14 +44,14 @@ def plot_loss(history):
     fig.show()
     
 def get_scatter(df, field, name = None):
-    
-    df = df.round(2)
-    
+
     if name == None:
         name = field
     
     if type(df) == dict:
         df = pd.DataFrame(df)
+        
+    df = df.round(2)
     
     scatter_trace = go.Scatter(x = df.index.values, 
                                y = df[field], 

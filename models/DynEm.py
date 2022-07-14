@@ -90,8 +90,6 @@ class InterchangeANN(nn.Module):
 
         return x
 
-
-
 class NodeFeaturesANN(nn.Module):
     def __init__(self, in_dims, out_dims):
         super(NodeFeaturesANN, self).__init__()

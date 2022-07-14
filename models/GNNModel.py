@@ -3,18 +3,18 @@ import torch
 from models.DynEm import DynEm
 
 class GNNModel(torch.nn.Module):
-    def __init__(self, steps_ahead, steps_behind):
+    def __init__(self, prediction_steps, steps_behind):
         super().__init__()
-        self.steps_ahead    = steps_ahead
+        self.prediction_steps    = prediction_steps
         self.steps_behind   = steps_behind
-        self.length_window  = (2*steps_behind) + steps_ahead
+        self.length_window  = (2*steps_behind) + prediction_steps
         
         self.DynEM_layer1 = DynEm(in_dims = 2 * self.length_window + 2, 
                                   in_node_features = self.length_window, 
                                   out_dims = 5)
         self.DynEM_layer2 = DynEm(in_dims = 2*5 + 2, 
                                   in_node_features = 5, 
-                                  out_dims = steps_ahead)
+                                  out_dims = prediction_steps)
 
     def forward(self, data):
         d = copy.deepcopy(data) 
@@ -27,23 +27,19 @@ class GNNModel(torch.nn.Module):
         norm_in_offset  = d.norm_in_offset
         norm_out_offset = d.norm_out_offset
         
-        h0 = d.x[:, :self.steps_behind]
-        runoff = d.x[:, self.steps_behind:]
-
+        h0      = d.x[:, :self.steps_behind]
+        runoff  = d.x[:, self.steps_behind:]
+        
         length_simulation = runoff.shape[1] - self.steps_behind
         num_nodes       = d.num_nodes
         
-        pred = torch.zeros(num_nodes, length_simulation)        
-        # print('pred.shape', pred.shape)
-        # print('self.steps_behind', self.steps_behind)
-        # print('self.steps_ahead', self.steps_ahead)
+        pred = torch.zeros(num_nodes, length_simulation)      
         
-        
-        for step in range(0,length_simulation, self.steps_ahead):
-            runoff_step = runoff[:, step:step+self.steps_ahead+self.steps_behind]
-            # print('runoff_step.shape', runoff_step.shape)
+        for step in range(0,length_simulation, self.prediction_steps):
+            runoff_step = runoff[:, step:step+self.prediction_steps+self.steps_behind]
+            
             one_step_x = torch.cat((h0, runoff_step), dim = 1)
-            # print('one_step_x.shape',one_step_x.shape)
+            
             out_mp = self.DynEM_layer1(edge_index,
                                 one_step_x,
                                 norm_elev,
@@ -62,7 +58,7 @@ class GNNModel(torch.nn.Module):
                                 norm_out_offset
                                 )
             
-            pred[:, step:step+self.steps_ahead] = y
+            pred[:, step:step+self.prediction_steps] = y
             h0 = self.get_new_h0(h0,y)
 
         return pred

@@ -62,7 +62,6 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
             min_val_loss = val_loss
             best_model_parameters = copy.deepcopy(model.state_dict())
             epoch_best_model = epoch
-            print('Best model so far at epoch: ', epoch)
         printCurrentStatus(epochs, epoch, train_loss, val_loss, report_freq)
 
         history['Training loss'].append(train_loss)

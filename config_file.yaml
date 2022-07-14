@@ -16,7 +16,6 @@ use_saved_validation_windows: false,
 num_events_training    : 50,
 num_events_validation  : 10,
 steps_ahead            : 3,
-steps_behind           : 6,
-epochs                 : 20,
-
+steps_behind           : 1,
+epochs                 : 40,
 }

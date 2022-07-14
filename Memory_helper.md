@@ -149,3 +149,42 @@ Presenter class
 Session class
 
 Visualize the heads with the inverted hietograph
+
+## 2022-07-14 11:58:06
+
+Conduit shapes
+
+----------------------------------------------------------------
+
+Based on the last supervisors' meeting:
+
+* Autocorrelation for previous time steps selection
+* Reducing register time step
+* Am I lagging?
+* Are my assumptions valid?
+* Easier things first. -> Go back to Toy Case?
+* Check Danish paper to see what they do
+
+----------------------------------------------------------------
+
+I can improve the YAML so that it integrates with Tensorboard.
+Use it in DelftBlue to run experiments.
+
+Determine a set of experiments.
+
+Determine a framework for analysis of the experiments.
+
+Additions before going to experiments:
+
+* Coder - Processor - Decoder structure
+* 
+
+Experiment hypothesis:
+
+* Learning rate too high? Too low?
+* Too few training examples?
+* The network is too complicated or too simple?
+* The MLPs are too simple
+* The activation functions of the MLPs are too simple
+
+#Annotation It seems that the best results are achieved by predicting the next time step. Considering 3 steps ahead (so that it accounts for future steps as well) in training, but predicting only 1 step at the time. 

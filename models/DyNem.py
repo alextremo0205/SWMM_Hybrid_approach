@@ -2,16 +2,12 @@ import torch
 import torch.nn as nn
 from torch_geometric.nn import MessagePassing
 
-from models.RunoffANN import RunoffANN
-from models.InterchangeANN import InterchangeANN
-
-
 class DynEm(MessagePassing):
-    def __init__(self):
+    def __init__(self, in_dims, in_node_features, out_dims):
         
         super().__init__(aggr='add', flow = 'target_to_source')
-        self.interchangeANN     = InterchangeANN()
-        self.RunoffANN          = RunoffANN()
+        self.interchangeANN     = InterchangeANN(in_dims, out_dims)
+        self.nodeFeaturesANN    = NodeFeaturesANN(in_node_features, out_dims)
         
         
     def forward(self, edge_index, 
@@ -31,22 +27,10 @@ class DynEm(MessagePassing):
     
     def message(self, x_i, x_j, norm_elev_i, norm_elev_j, norm_length, norm_geom_1, norm_in_offset, norm_out_offset):
         
-        hi = x_i[:, 0].reshape(-1,1)
-        hj = x_j[:, 0].reshape(-1,1)
-        
-        mask_flows = self.get_mask_flows(hi, hj, norm_elev_i, norm_elev_j, norm_in_offset, norm_out_offset)
-
-        dif = (hj-hi) #nn.Tanh()
-        
-        # assert dif.max().item() <= 1, 'Max. difference is greater than 1 ' + str(dif.max().item())
-        # assert dif.min().item() >= -1, 'Min. difference is less than -1 ' + str(dif.min().item())
-        
-        x_interchange = torch.concat((dif, norm_length, norm_geom_1, mask_flows), axis=1)
+        x_interchange = torch.concat((x_i, x_j, norm_length, norm_geom_1), axis=1)
         result_nn_interchange = self.interchangeANN(x_interchange)
-        
-        depth_interchange = torch.mul(result_nn_interchange, mask_flows)
-        
-        return depth_interchange
+                
+        return result_nn_interchange
 
     
     def update(self, inputs, x, norm_elev):
@@ -55,6 +39,7 @@ class DynEm(MessagePassing):
         
         new_var = self.nodeFeaturesANN(x)
         candidate_h = new_var + inputs
+        
         # print('Dims of self.nodeFeaturesANN(x): ', candidate_h.shape)
         # new_h = torch.max(candidate_h, norm_elev)
                
@@ -76,11 +61,51 @@ class DynEm(MessagePassing):
         node_j_will_flow = torch.logical_and(hj_is_over_invert, should_flow_j_to_i) 
         
         mask_flows = torch.logical_or(node_i_will_flow, node_j_will_flow)
-            
+        
         return mask_flows
 
     
     def __repr__(self) -> str:
-        return (f'{self.__class__.__name__}({self.interchangeANN}, aggr={self.aggr}')
+        return (f'{self.__class__.__name__}(Interchange ANN = {self.interchangeANN}, NodeFeatures ANN = {self.nodeFeaturesANN}, aggr={self.aggr}')
                 
-    
+
+
+class InterchangeANN(nn.Module):
+    def __init__(self, in_dims, out_dims):
+        super(InterchangeANN, self).__init__()
+
+        self.linear_stack = nn.Sequential(
+
+            nn.Linear(in_dims, 16 ),#   , bias = False),
+            nn.ReLU(),
+            nn.Linear(16, 8       ),#   , bias = False),
+            nn.ReLU(),
+            nn.Linear(8, out_dims ),#  , bias = False),
+            
+            nn.ReLU()
+        )
+    def forward(self, x):
+
+        x = self.linear_stack(x)
+
+        return x
+
+
+
+class NodeFeaturesANN(nn.Module):
+    def __init__(self, in_dims, out_dims):
+        super(NodeFeaturesANN, self).__init__()
+        
+        self.linear_stack = nn.Sequential(
+            nn.Linear(in_dims, 16, ),# bias = False),
+            nn.ReLU(),
+            nn.Linear(16, 8,       ),# bias = False),
+            nn.ReLU(),
+            nn.Linear(8, out_dims, ),# bias = False),
+            nn.ReLU()
+        )
+    def forward(self, x):
+        
+        x = self.linear_stack(x)
+        
+        return x

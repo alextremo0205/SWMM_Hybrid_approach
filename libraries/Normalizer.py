@@ -1,4 +1,5 @@
 import torch
+import pandas as pd
 from torch_geometric.loader import DataLoader
 
 class Normalizer:
@@ -17,7 +18,8 @@ class Normalizer:
         self.max_runoff = self.use_function_get_value(torch.max, 'runoff')
         self.min_runoff = self.use_function_get_value(torch.min, 'runoff')
         
-                
+        self.name_nodes = training_windows[0].name_nodes
+        
     def get_min_h(self):
         extreme_min_h_x = self.use_function_get_value(torch.min, 'h_x')
         extreme_min_h_y = self.use_function_get_value(torch.min, 'h_y')
@@ -131,7 +133,12 @@ class Normalizer:
 
     def unnormalize_heads(self, normalizedHeads):
         return (normalizedHeads)*(self.max_h-self.min_h) + self.min_h
-        
+    
+    def get_unnormalized_heads_pd(self, tensor_heads):
+        normalized_heads_tensor     = self.unnormalize_heads(tensor_heads)
+        normalized_heads_np         = normalized_heads_tensor.detach().numpy()
+        normalized_heads_pd         = pd.DataFrame(dict(zip(self.name_nodes, normalized_heads_np)))
+        return normalized_heads_pd
         
     def get_dataloader(self, batch_size):
         list_of_windows = self.get_list_normalized_training_windows()

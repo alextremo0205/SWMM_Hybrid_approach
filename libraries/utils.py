@@ -6,10 +6,16 @@ import pickle
 import numpy as np
 import pandas as pd
 import networkx as nx
+from pygit2 import Repository
+
 import plotly.express as px
 import plotly.graph_objects as go
 
 from libraries.SWMM_Simulation import SWMMSimulation
+
+
+def print_current_git_branch():
+    print("The current branch is: " + Repository('.').head.shorthand)
 
 def load_yaml(yaml_path):
     with open(yaml_path) as f:
@@ -88,14 +94,17 @@ def extract_simulations_from_folders(simulations_path, inp_path, max_events=-1):
     simulations =[]
     
     num_saved_events = 0
-    for simulation in list_of_simulations:
-        hydraulic_heads_path = '\\'.join([simulations_path,simulation,'hydraulic_head.pk'])
-        runoff_path = '\\'.join([simulations_path,simulation,'runoff.pk'])
+    for name_simulation in list_of_simulations:
+        hydraulic_heads_path = '\\'.join([simulations_path,name_simulation,'hydraulic_head.pk'])
+        runoff_path = '\\'.join([simulations_path,name_simulation,'runoff.pk'])
+        rain_path = '\\'.join([simulations_path,name_simulation, name_simulation+'.dat'])
         
         heads_raw_data = get_heads_from_pickle(hydraulic_heads_path)
         runoff_raw_data = get_runoff_from_pickle(runoff_path)
         
-        sim = SWMMSimulation(G, heads_raw_data, runoff_raw_data, simulation)
+        rain_raw_data = get_rain_in_pandas(rain_path)
+        
+        sim = SWMMSimulation(G, heads_raw_data, runoff_raw_data, rain_raw_data, name_simulation)
         simulations.append(sim)
         
         if num_saved_events>=max_events:
@@ -311,11 +320,21 @@ def get_subcatchments(lines, inp_dict):
 def count_parameters(model):
     return sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-def tensor_heads_to_normalized_pd(tensor_heads, normalizer, name_nodes):
-    normalized_heads_tensor = normalizer.unnormalize_heads(tensor_heads)
-    normalized_heads_np = normalized_heads_tensor.detach().numpy()
-    normalized_heads_pd = pd.DataFrame(dict(zip(name_nodes, normalized_heads_np)))
-    return normalized_heads_pd
-
 def head_to_unnormalized_depth(head, normalizer, ref_window):
     return normalizer.unnormalize_heads(head-ref_window.norm_elev.reshape(-1))-normalizer.min_h
+
+def get_all_windows_from_list_simulations(simulations, steps_ahead, steps_behind):
+    windows = []
+    for sim in simulations:
+        windows += sim.get_all_windows(steps_ahead = steps_ahead, steps_behind = steps_behind)
+    return windows
+
+def load_windows(windows_path):
+    with open(windows_path, 'rb') as handle:
+        windows = pickle.load(handle)
+    print('Using loaded windows from: ', windows_path)
+    return windows
+
+def save_pickle(variable, path):
+    with open(path, 'wb') as handle:
+        pickle.dump(variable, handle)

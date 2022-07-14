@@ -1,13 +1,21 @@
-# Hydralic head configuration file
 {
+training_simulations_path :   'data\simulations\training',
+validation_simulations_path : 'data\simulations\validation',
+testing_simulations_path :    'data\simulations\testing',
 
-# networks names
-training_simulations_path : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\training',
-validation_simulations_path : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\validation',
-testing_simulations_path : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\testing',
+zero_cases_simulations_path : 'data\simulations\zero cases',
 
-zero_cases_simulations_path : 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\simulations\zero cases',
+inp_path:                     'data\networks\Tuindorp_Right_Part.inp',
 
-inp_path: 'C:\Users\agarzondiaz\surfdrive\Year 2\Paper 2 - 3.0\data\networks\Tuindorp_Right_Part.inp',
+training_windows_path   :     'saved_objects\training_windows_debugging.pk',
+validation_windows_path :     'saved_objects\validation_windows_5_events_4_steps.pk',
 
+use_saved_training_windows  : false,
+use_saved_validation_windows: false,
+
+num_events_training    : 50,
+num_events_validation  : 10,
+steps_ahead            : 3,
+steps_behind           : 1,
+epochs                 : 40,
 }

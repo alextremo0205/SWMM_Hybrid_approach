@@ -1,19 +1,21 @@
 # From https://www.inside-machinelearning.com/en/the-ideal-pytorch-function-to-train-your-model-easily/
 
 import time
+import copy
 
 def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, device='cpu', report_freq = 10):
 
     print_initial_message(model, optimizer, epochs, device)
-
     history = initialize_history()
-
     start_time_sec = time.time()
 
+    min_val_loss    = 1e6
+    best_model_parameters = copy.deepcopy(model.state_dict())
+    epoch_best_model = -1
     
-    last_loss   = 100
-    patience    = 3
-    trigger_times = 0
+    last_loss       = 100
+    patience        = 3
+    trigger_times   = 0
 
     for epoch in range(1, epochs+1):
 
@@ -44,7 +46,7 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
         # --- EVALUATE ON VALIDATION SET -------------------------------------
         model.eval()
         val_loss       = 0.0
-
+        
         for batch in val_dl:
 
             x    = batch.to(device)
@@ -56,6 +58,10 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
 
         val_loss = val_loss / len(val_dl.dataset)
 
+        if val_loss < min_val_loss:
+            min_val_loss = val_loss
+            best_model_parameters = copy.deepcopy(model.state_dict())
+            epoch_best_model = epoch
         printCurrentStatus(epochs, epoch, train_loss, val_loss, report_freq)
 
         history['Training loss'].append(train_loss)
@@ -64,7 +70,7 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
     
         # Early stopping
         current_loss = val_loss
-        if abs(current_loss - last_loss) < 1e-4:
+        if abs(current_loss - last_loss) < 1e-4 or current_loss>last_loss:
             trigger_times += 1
             
             if trigger_times >= patience:
@@ -78,7 +84,11 @@ def train(model, optimizer, scheduler, loss_fn, train_dl, val_dl, epochs=100, de
     
     # END OF TRAINING LOOP
 
-
+    model.load_state_dict(best_model_parameters)
+    
+    print('Best model found at epoch: ', epoch_best_model)
+    print('This best model has this validation loss: ', min_val_loss)
+    
     end_time_sec       = time.time()
     total_time_sec     = end_time_sec - start_time_sec
     time_per_epoch_sec = total_time_sec / epochs

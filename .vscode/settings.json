@@ -1,24 +1,4 @@
 {
-    "workbench.colorCustomizations": {
-        "activityBar.activeBackground": "#454545",
-        "activityBar.activeBorder": "#000000",
-        "activityBar.background": "#454545",
-        "activityBar.foreground": "#e7e7e7",
-        "activityBar.inactiveForeground": "#e7e7e799",
-        "activityBarBadge.background": "#000000",
-        "activityBarBadge.foreground": "#e7e7e7",
-        "sash.hoverBorder": "#454545",
-        "statusBar.background": "#2c2c2c",
-        "statusBar.foreground": "#e7e7e7",
-        "statusBarItem.hoverBackground": "#454545",
-        "statusBarItem.remoteBackground": "#2c2c2c",
-        "statusBarItem.remoteForeground": "#e7e7e7",
-        "titleBar.activeBackground": "#2c2c2c",
-        "titleBar.activeForeground": "#e7e7e7",
-        "titleBar.inactiveBackground": "#2c2c2c99",
-        "titleBar.inactiveForeground": "#e7e7e799"
-    },
-    "peacock.color": "#2C2C2C",
     "python.testing.unittestArgs": [
         "-v",
         "-s",
@@ -29,5 +9,6 @@
     "python.testing.pytestEnabled": false,
     "python.testing.unittestEnabled": true,
     "python.linting.pylintEnabled": true,
-    "python.linting.enabled": false
+    "python.linting.enabled": false,
+
 }

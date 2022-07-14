@@ -17,8 +17,6 @@ import torch.nn as nn
 import torch.optim as optim
 from torch_geometric.loader import DataLoader
 
-torch.set_printoptions(precision=4, sci_mode = False)
-
 ## Custom modules
 from models.GNNModel import GNNModel
 import visualization.Visualization as vis
@@ -29,5 +27,5 @@ from libraries.SWMM_Simulation import SWMMSimulation
 
 import libraries.utils as utils
 
-
+torch.set_printoptions(precision=4, sci_mode = False)
 utils.print_current_git_branch()

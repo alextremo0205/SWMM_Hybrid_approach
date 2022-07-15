@@ -58,6 +58,7 @@ class GNNModel(torch.nn.Module):
                                 norm_out_offset
                                 )
             
+            
             pred[:, step:step+self.prediction_steps] = y
             h0 = self.get_new_h0(h0,y)
 

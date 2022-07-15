@@ -176,8 +176,8 @@ Determine a framework for analysis of the experiments.
 
 Additions before going to experiments:
 
-* Coder - Processor - Decoder structure
-* 
+* Coder - Processor - Decoder structure.
+* Include the elevation in the calculations.
 
 Experiment hypothesis:
 
@@ -187,4 +187,12 @@ Experiment hypothesis:
 * The MLPs are too simple
 * The activation functions of the MLPs are too simple
 
-#Annotation It seems that the best results are achieved by predicting the next time step. Considering 3 steps ahead (so that it accounts for future steps as well) in training, but predicting only 1 step at the time. 
+**Annotation:** It seems that the best results are achieved by predicting the next time step. Considering 3 steps ahead (so that it accounts for future steps as well) in training, but predicting only 1 step at the time.
+
+## 2022-07-15 09:37:41
+
+Have an coder MLP for nodes and edges (one for each). Have MLPs for decoders, one for nodes and another for edges. The output of the nodes is the head, the output for the edges is the flows.
+
+Testing $\LaTeX$:
+
+$$ \frac{\pi^2}{6} $$

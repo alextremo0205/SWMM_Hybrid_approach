@@ -8,3 +8,4 @@ tests/__pycache__/
 models/__pycache__/
 libraries/__pycache__/
 visualization/__pycache__/
+models/__pycache__/GNNModel.cpython-310.pyc
